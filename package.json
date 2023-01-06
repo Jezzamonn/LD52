@@ -1,0 +1,10 @@
+{
+  "name": "ld52",
+  "version": "1.0.0",
+  "description": "Ludum Dare 52",
+  "main": "webpack.config.js",
+  "scripts": {
+  },
+  "author": "Jezzamon",
+  "license": "ISC"
+}

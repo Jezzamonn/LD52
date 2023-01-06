@@ -1,0 +1,10 @@
+promo/*
+!promo/publish/
+
+build/
+.vscode/
+node_modules
+profiles/
+
+music/
+!music/*.mp3
