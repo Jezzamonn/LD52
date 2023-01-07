@@ -1,6 +1,7 @@
 import { Point } from "../common";
 import { Entity } from "../entity/entity";
 import { Seed } from "../entity/seed";
+import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { Tile, Tiles } from "./tiles";
 
@@ -8,6 +9,8 @@ import { Tile, Tiles } from "./tiles";
 export class Level {
     game: Game;
     entities: Entity[] = [];
+
+    camera: Camera = new Camera();
 
     tiles: Tiles = new Tiles(0, 0);
 
@@ -60,6 +63,11 @@ export class Level {
             seed.midX = this.start.x;
             seed.maxY = this.start.y;
             this.entities.push(seed);
+
+            const fc = new FocusCamera();
+            fc.target = () => ({x: seed.midX, y: seed.minY});
+
+            this.camera = fc;
         }
     }
 
@@ -67,9 +75,12 @@ export class Level {
         for (const entity of this.entities) {
             entity.update(dt);
         }
+        this.camera.update(dt);
     }
 
     render(context: CanvasRenderingContext2D) {
+        this.camera.applyTransform(context);
+
         this.renderSky(context);
 
         this.tiles.render(context);

@@ -3,6 +3,7 @@ import { Seed } from "../entity/seed";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { KeyboardKeys, RegularKeys } from "../lib/keys";
+import { centerCanvas } from "./camera";
 import { Level } from "./level";
 import { Tiles } from "./tiles";
 
@@ -82,6 +83,7 @@ export class Game {
 
     render() {
         this.context.resetTransform();
+        centerCanvas(this.context);
         this.context.scale(this.scale, this.scale);
 
         try {
