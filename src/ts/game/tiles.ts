@@ -12,7 +12,6 @@ export enum Tile {
  * 2D array of tiles.
  */
 export class Tiles {
-
     tiles: Tile[][] = [];
 
     w = 0;
@@ -35,7 +34,7 @@ export class Tiles {
 
     render(context: CanvasRenderingContext2D) {
         if (!this.image) {
-            const imageInfo = Images.images['tiles'];
+            const imageInfo = Images.images["tiles"];
             if (!imageInfo.loaded) {
                 return;
             }
@@ -43,8 +42,11 @@ export class Tiles {
         }
 
         const invMatrix = context.getTransform().inverse();
-        const gameMinPoint = invMatrix.transformPoint({x: 0, y: 0});
-        const gameMaxPoint = invMatrix.transformPoint({x: context.canvas.width, y: context.canvas.height});
+        const gameMinPoint = invMatrix.transformPoint({ x: 0, y: 0 });
+        const gameMaxPoint = invMatrix.transformPoint({
+            x: context.canvas.width,
+            y: context.canvas.height,
+        });
 
         const minXTile = Math.floor(gameMinPoint.x / TILE_SIZE_PX);
         const minYTile = Math.floor(gameMinPoint.y / TILE_SIZE_PX);
@@ -53,30 +55,82 @@ export class Tiles {
 
         for (let y = minYTile; y <= maxYTile; y++) {
             for (let x = minXTile; x <= maxXTile; x++) {
-                const tile = this.getTile({x, y});
-                if (tile == Tile.Wall) {
-                    this.renderTile(context, {x: 0, y: 0}, {x: x * TILE_SIZE_PX, y: y * TILE_SIZE_PX});
+                this.renderTile(context, { x, y });
+            }
+        }
+    }
+
+    renderTile(
+        context: CanvasRenderingContext2D,
+        pos: Point,
+    ) {
+        const tile = this.getTile(pos);
+        const renderPos = {x: pos.x * TILE_SIZE_PX, y: pos.y * TILE_SIZE_PX }
+
+        if (tile == Tile.Wall) {
+            // Loop through each corner
+            for (const dx of [-1, 1]) {
+                const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
+                for (const dy of [-1, 1]) {
+                    const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
+                    const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
+                    const dxdyTile = this.getTile({ x: pos.x + dx, y: pos.y + dy });
+                    let tilePos: Point;
+
+                    if (dyTile == Tile.Wall) {
+                        if (dxTile == Tile.Wall) {
+                            if (dxdyTile != Tile.Wall) {
+                                // Ending part of the platform.
+                                tilePos = { x: 0, y: 2 };
+                            } else {
+                                tilePos = { x: 0, y: 4 };
+                            }
+                        } else {
+                            tilePos = { x: 0, y: 3 };
+                        }
+                    } else {
+                        if (dxTile == Tile.Wall) {
+                            tilePos = { x: 0, y: 1 };
+                        } else {
+                            tilePos = { x: 0, y: 0 };
+                        }
+                    }
+                    this.drawFromTileSet(
+                        context,
+                        {
+                            tilePos,
+                            subTilePos,
+                            renderPos
+                        }
+                    );
                 }
             }
         }
     }
 
-    renderTile(context: CanvasRenderingContext2D, spriteSheetPos: Point, pos: Point) {
+    drawFromTileSet(
+        context: CanvasRenderingContext2D,
+        {
+            tilePos,
+            subTilePos,
+            renderPos,
+        }: { tilePos: Point; subTilePos: Point; renderPos: Point }
+    ) {
+        const halfTileSize = TILE_SIZE_PX / 2;
         // Image must be loaded when this is called.
         context.drawImage(
             this.image!,
-            spriteSheetPos.x * TILE_SIZE_PX,
-            spriteSheetPos.y * TILE_SIZE_PX,
-            TILE_SIZE_PX,
-            TILE_SIZE_PX,
-            pos.x,
-            pos.y,
+            tilePos.x * TILE_SIZE_PX + subTilePos.x * halfTileSize,
+            tilePos.y * TILE_SIZE_PX + subTilePos.y * halfTileSize,
+            halfTileSize,
+            halfTileSize,
+            // TODO: I'm not sure about these being in the right coordinate space.
+            renderPos.x + subTilePos.x * halfTileSize,
+            renderPos.y + subTilePos.y * halfTileSize,
             // +1 is a kludge to avoid gaps between tiles.
-            TILE_SIZE_PX + 1,
-            TILE_SIZE_PX + 1);
-        // Fallback: Lets start with drawing a rectangle.
-        // context.fillStyle = 'black';
-        // context.fillRect(pos.x, pos.y, TILE_SIZE, TILE_SIZE);
+            halfTileSize,
+            halfTileSize
+        );
     }
 
     setTile(p: Point, tile: Tile) {
@@ -101,6 +155,6 @@ export class Tiles {
     }
 
     static async preload() {
-        await Images.loadImage({name: 'tiles', path: 'sprites/'})
+        await Images.loadImage({ name: "tiles", path: "sprites/" });
     }
 }

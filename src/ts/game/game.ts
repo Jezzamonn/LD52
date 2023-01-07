@@ -1,4 +1,4 @@
-import { TIME_STEP } from "../constants";
+import { GAME_HEIGHT_PX, GAME_WIDTH_PX, TIME_STEP } from "../constants";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { Level } from "./level";
@@ -83,18 +83,20 @@ export class Game {
         const windowHeight = window.innerHeight;
         const pixelScale = window.devicePixelRatio || 1;
 
-        const xScale = windowWidth / this.canvas.width;
-        const yScale = windowHeight / this.canvas.height;
+        const xScale = windowWidth / GAME_WIDTH_PX;
+        const yScale = windowHeight / GAME_HEIGHT_PX;
 
         // Math.min = scale to fit
         this.scale = Math.min(xScale, yScale) * pixelScale;
-        this.xMargin = (windowWidth - this.canvas.width * this.scale) / 2;
-        this.yMargin = (windowHeight - this.canvas.height * this.scale) / 2;
+        console.log(`Scale: ${this.scale}`);
+        // this.xMargin = (windowWidth - this.canvas.width * this.scale) / 2;
+        // this.yMargin = (windowHeight - this.canvas.height * this.scale) / 2;
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;
         this.canvas.style.width = `${windowWidth}px`;
         this.canvas.style.height = `${windowHeight}px`;
+        Aseprite.disableSmoothing(this.context);
     }
 
     static async preload() {
