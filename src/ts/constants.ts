@@ -5,7 +5,7 @@ export const PHYSICS_SCALE = 16;
 export const FPS = 60;
 export const TIME_STEP = 1 / FPS;
 
-export const PIXEL_SCALE = 3;
+export const PIXEL_SCALE = 4;
 
 export const GAME_WIDTH_PX = Math.round(800 / PIXEL_SCALE);
 export const GAME_HEIGHT_PX = Math.round(600 / PIXEL_SCALE);

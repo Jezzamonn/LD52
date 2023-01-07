@@ -25,6 +25,24 @@ export class Seed extends Entity {
         if (Math.abs(this.dx) > 0.01) {
             animName = 'run';
         }
+        if (!this.isOnGround()) {
+            animName = 'jump';
+            if (this.dy < -0.7 * this.jumpSpeed) {
+                animName += '-up-up';
+            }
+            else if (this.dy < -0.3 * this.jumpSpeed) {
+                animName += '-up';
+            }
+            else if (this.dy > 0.7 * this.jumpSpeed) {
+                animName += '-down-down';
+            }
+            else if (this.dy > 0.3 * this.jumpSpeed) {
+                animName += '-down';
+            }
+            else {
+                animName += '-mid';
+            }
+        }
         Aseprite.drawAnimation({
             context,
             image: 'seed',

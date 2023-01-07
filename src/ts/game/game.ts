@@ -71,7 +71,12 @@ export class Game {
     }
 
     update(dt: number) {
-        this.curLevel?.update(dt);
+        try {
+            this.curLevel?.update(dt);
+        }
+        catch (e) {
+            // Do nothing.
+        }
         this.keys.resetFrame();
     }
 
@@ -79,7 +84,12 @@ export class Game {
         this.context.resetTransform();
         this.context.scale(this.scale, this.scale);
 
-        this.curLevel?.render(this.context);
+        try {
+            this.curLevel?.render(this.context);
+        }
+        catch (e) {
+            // Do nothing
+        }
     }
 
     resize() {
