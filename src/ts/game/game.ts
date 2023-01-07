@@ -1,6 +1,8 @@
-import { GAME_HEIGHT, GAME_WIDTH, TIME_STEP } from "../constants";
+import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, TIME_STEP } from "../constants";
+import { Seed } from "../entity/seed";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
+import { KeyboardKeys, RegularKeys } from "../lib/keys";
 import { Level } from "./level";
 import { Tiles } from "./tiles";
 
@@ -14,6 +16,7 @@ export class Game {
     simulatedTimeMs: number | undefined;
 
     curLevel: Level | undefined;
+    keys: RegularKeys;
 
     constructor(canvasSelector: string) {
         const canvas = document.querySelector<HTMLCanvasElement>(canvasSelector);
@@ -25,10 +28,13 @@ export class Game {
         this.canvas = canvas;
         this.context = context;
 
+        this.keys = new KeyboardKeys();
     }
 
     start() {
-        const level = new Level();
+        this.keys.setUp();
+
+        const level = new Level(this);
         level.initFromImage(Images.images['level1'].image!);
         this.curLevel = level;
 
@@ -66,6 +72,7 @@ export class Game {
 
     update(dt: number) {
         this.curLevel?.update(dt);
+        this.keys.resetFrame();
     }
 
     render() {
@@ -80,11 +87,12 @@ export class Game {
         const windowHeight = window.innerHeight;
         const pixelScale = window.devicePixelRatio || 1;
 
-        const xScale = windowWidth / GAME_WIDTH;
-        const yScale = windowHeight / GAME_HEIGHT;
+        const xScale = windowWidth / GAME_WIDTH_PX;
+        const yScale = windowHeight / GAME_HEIGHT_PX;
 
         // Math.min = scale to fit
-        this.scale = Math.min(xScale, yScale) * pixelScale;
+        const pxScale = Math.floor(Math.min(xScale, yScale) * pixelScale);
+        this.scale = pxScale / PHYSICS_SCALE;
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;
@@ -94,7 +102,10 @@ export class Game {
     }
 
     static async preload() {
-        await Images.loadImage({name: 'level1', path: 'level/', extension: 'gif'});
-        await Tiles.preload();
+        await Promise.all([
+            Images.loadImage({name: 'level1', path: 'level/', extension: 'gif'}),
+            Tiles.preload(),
+            Seed.preload(),
+        ]);
     }
 }

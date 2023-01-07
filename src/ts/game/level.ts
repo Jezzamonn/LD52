@@ -1,17 +1,21 @@
 import { Point } from "../common";
 import { Entity } from "../entity/entity";
 import { Seed } from "../entity/seed";
+import { Game } from "./game";
 import { Tile, Tiles } from "./tiles";
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
+    game: Game;
     entities: Entity[] = [];
 
     tiles: Tiles = new Tiles(0, 0);
 
     start: Point = { x: 0, y: 0 };
 
-    constructor() {}
+    constructor(game: Game) {
+        this.game = game;
+    }
 
     initFromImage(image: HTMLImageElement) {
         this.entities = [];

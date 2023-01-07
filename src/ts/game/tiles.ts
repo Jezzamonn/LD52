@@ -162,6 +162,10 @@ export class Tiles {
         }
     }
 
+    getTileCoordFromCoord(p: Point, positionInTile: Point): Point {
+        return this.getTileCoord({x: Math.floor(p.x / TILE_SIZE), y: Math.floor(p.y / TILE_SIZE)}, positionInTile);
+    }
+
     static async preload() {
         await Images.loadImage({ name: "tiles", path: "sprites/" });
     }
