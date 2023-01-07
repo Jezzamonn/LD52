@@ -30,7 +30,7 @@ export class FocusCamera extends Camera {
             return;
         }
 
-        const updateSmoothness = 1 - Math.exp(-5 * dt);
+        const updateSmoothness = 1 - Math.exp(-3 * dt);
         this.curPos.x = lerp(this.curPos.x, targetPos.x, updateSmoothness);
         this.curPos.y = lerp(this.curPos.y, targetPos.y, updateSmoothness);
     }
@@ -42,8 +42,10 @@ export class FocusCamera extends Camera {
     }
 }
 
-const screenPos: Point = { x: 0.5, y: 0.7 };
+const screenPos: Point = { x: 0.5, y: 0.6 };
 
 export function centerCanvas(context: CanvasRenderingContext2D) {
-    context.translate(Math.round(context.canvas.width * screenPos.x), Math.round(context.canvas.height * screenPos.y));
+    context.translate(
+        Math.round(context.canvas.width * screenPos.x),
+        Math.round(context.canvas.height * screenPos.y));
 }

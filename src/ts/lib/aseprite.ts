@@ -485,6 +485,7 @@ export function drawAnimation({
     flippedX = false,
     flippedY = false,
     filter = "",
+    loop = true
 }: {
     context: CanvasRenderingContext2D;
     image: string | ImageMetadata;
@@ -496,6 +497,7 @@ export function drawAnimation({
     flippedX?: boolean;
     flippedY?: boolean;
     filter?: string;
+    loop?: boolean;
 }): boolean {
     if (typeof image === "string") {
         image = images[image];
@@ -505,7 +507,7 @@ export function drawAnimation({
         return false;
     }
 
-    const frame = getFrame(image, animationName, time);
+    const frame = getFrame(image, animationName, time, loop);
 
     return drawSprite({
         context,
@@ -526,12 +528,16 @@ export function drawAnimation({
 function getFrame(
     imageData: ImageMetadata,
     animationName: string,
-    time: number
+    time: number,
+    loop: boolean
 ) {
     if (!imageData.frames) {
         return -1;
     }
     const animData = imageData.animations[animationName];
+    if (!loop) {
+        time = Math.min(time, animData.length / 1000 - 1);
+    }
     const localTimeMs = (1000 * time) % animData.length;
     let cumulativeTimeMs = 0;
     for (let i = animData.from; i <= animData.to; i++) {

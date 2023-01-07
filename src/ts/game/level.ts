@@ -10,7 +10,7 @@ export class Level {
     game: Game;
     entities: Entity[] = [];
 
-    camera: Camera = new Camera();
+    camera: FocusCamera = new FocusCamera();
 
     tiles: Tiles = new Tiles(0, 0);
 
@@ -57,18 +57,16 @@ export class Level {
             this.start = this.tiles.getTileCoord(startTile, { x: 0.5, y: 1 });
         }
 
-        // Make player
-        {
-            const seed = new Seed(this);
-            seed.midX = this.start.x;
-            seed.maxY = this.start.y;
-            this.entities.push(seed);
+        this.spawnPlayer();
+    }
 
-            const fc = new FocusCamera();
-            fc.target = () => ({x: seed.midX, y: seed.minY});
+    spawnPlayer() {
+        const seed = new Seed(this);
+        seed.midX = this.start.x;
+        seed.maxY = this.start.y;
+        this.entities.push(seed);
 
-            this.camera = fc;
-        }
+        this.camera.target = () => ({x: seed.midX, y: seed.minY});
     }
 
     update(dt: number) {

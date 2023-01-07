@@ -58,6 +58,8 @@ export class Entity {
     moveX(dt: number) {
         this.x += this.dx * dt;
 
+        this.x = Math.round(this.x);
+
         if (!this.canCollide) {
             return;
         }
@@ -75,6 +77,8 @@ export class Entity {
 
     moveY(dt: number) {
         this.y += this.dy * dt;
+
+        this.y = Math.round(this.y);
 
         if (!this.canCollide) {
             return;
