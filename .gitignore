@@ -1,10 +1,12 @@
-promo/*
+/promo/*
 !promo/publish/
 
-build/
+/build/
 .vscode/
 node_modules
 profiles/
 
-music/
+/music/
 !music/*.mp3
+
+/level/

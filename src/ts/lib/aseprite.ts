@@ -58,6 +58,7 @@ interface ImageMetadata {
     animations: {
         [key: string]: AnimationMetadata;
     };
+    loadPromise?: Promise<ImageMetadata>;
 }
 
 export type ColorMap = { [orig: string]: string };
@@ -99,10 +100,12 @@ interface ImageInfo {
  *
  * See `loadImage` for more info.
  */
-export function loadImages(imageInfos: ImageInfo[]) {
+export function loadImages(imageInfos: ImageInfo[]): Promise<ImageMetadata[]> {
+    const promises: Promise<ImageMetadata>[] = [];
     for (const imageInfo of imageInfos) {
-        loadImage(imageInfo);
+        promises.push(loadImage(imageInfo));
     }
+    return Promise.all(promises);
 }
 
 /**
@@ -119,13 +122,15 @@ export function loadImage({
     basePath = undefined,
     imagePath = undefined,
     jsonPath = undefined,
-}: ImageInfo) {
+}: ImageInfo): Promise<ImageMetadata> {
     if (!basePath && (!imagePath || !jsonPath)) {
-        throw "Must specify either a basePath or imagePath and jsonPath";
+        return Promise.reject(
+            "Must specify either a basePath or imagePath and jsonPath"
+        );
     }
 
     if (images.hasOwnProperty(name)) {
-        return;
+        return Promise.resolve(images[name]);
     }
 
     if (!imagePath || !jsonPath) {
@@ -146,18 +151,21 @@ export function loadImage({
         loaded: false,
         animations: {},
     };
-    const image = new Image();
-    image.onload = () => {
-        images[name].image = image;
-        images[name].imageLoaded = true;
-        images[name].loaded = images[name].jsonLoaded;
-    };
-    image.onerror = () => {
-        throw new Error(`Error loading image ${name}.`);
-    };
-    image.src = imagePath;
+    const imageLoadedPromise: Promise<void> = new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+            images[name].image = image;
+            images[name].imageLoaded = true;
+            images[name].loaded = images[name].jsonLoaded;
+            resolve();
+        };
+        image.onerror = () => {
+            reject(`Error loading image ${name}.`);
+        };
+        image.src = imagePath!;
+    });
     // Load JSON metadata.
-    fetch(jsonPath)
+    const jsonLoadedPromise: Promise<void> = fetch(jsonPath)
         .then((response) => {
             if (response.status != 200) {
                 throw new Error(
@@ -188,6 +196,13 @@ export function loadImage({
             images[name].jsonLoaded = true;
             images[name].loaded = images[name].imageLoaded;
         });
+
+    const allLoadedPromise = Promise.all([
+        imageLoadedPromise,
+        jsonLoadedPromise,
+    ]).then(() => images[name]);
+    images[name].loadPromise = allLoadedPromise;
+    return allLoadedPromise;
 }
 
 function applyEffect(
@@ -288,7 +303,9 @@ export function applyColorMap(name: string, colorMap: ColorMap) {
                 const r = color[0];
                 const g = color[1];
                 const b = color[2];
-                const colorHex = `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+                const colorHex = `#${r.toString(16)}${g.toString(
+                    16
+                )}${b.toString(16)}`;
                 if (colorMap.hasOwnProperty(colorHex)) {
                     const newColor = colorMap[colorHex];
                     context.fillStyle = newColor;
@@ -546,4 +563,4 @@ export const Aseprite = {
     get images() {
         return images;
     },
-}
+};
