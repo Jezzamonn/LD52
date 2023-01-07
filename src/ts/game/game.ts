@@ -10,6 +10,8 @@ export class Game {
     context: CanvasRenderingContext2D;
 
     scale = 1;
+    xMargin = 0;
+    yMargin = 0;
 
     simulatedTimeMs: number | undefined;
 
@@ -70,6 +72,7 @@ export class Game {
 
     render() {
         this.context.resetTransform();
+        this.context.translate(-this.xMargin, -this.yMargin);
         this.context.scale(this.scale, this.scale);
 
         this.curLevel?.render(this.context);
@@ -83,7 +86,10 @@ export class Game {
         const xScale = windowWidth / this.canvas.width;
         const yScale = windowHeight / this.canvas.height;
 
+        // Math.min = scale to fit
         this.scale = Math.min(xScale, yScale) * pixelScale;
+        this.xMargin = (windowWidth - this.canvas.width * this.scale) / 2;
+        this.yMargin = (windowHeight - this.canvas.height * this.scale) / 2;
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;

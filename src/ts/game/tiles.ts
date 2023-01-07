@@ -1,5 +1,5 @@
 import { Point } from "../common";
-import { PHYSICS_SCALE } from "../constants";
+import { PHYSICS_SCALE, TILE_SIZE, TILE_SIZE_PX } from "../constants";
 import { Aseprite, images } from "../lib/aseprite";
 import { Images } from "../lib/images";
 
@@ -7,9 +7,6 @@ export enum Tile {
     Empty = 0,
     Wall = 1,
 }
-
-export const TILE_SIZE_PX = 16;
-export const TILE_SIZE = TILE_SIZE_PX * PHYSICS_SCALE;
 
 /**
  * 2D array of tiles.

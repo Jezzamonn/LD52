@@ -51,15 +51,22 @@ export class Level {
     }
 
     render(context: CanvasRenderingContext2D) {
-        // Background sky color
-        context.fillStyle = '#b3b9d1';
-        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+        this.renderSky(context);
 
         this.tiles.render(context);
 
         for (const entity of this.entities) {
             entity.render(context);
         }
+    }
+
+    renderSky(context: CanvasRenderingContext2D) {
+        // Clear transform
+        context.save();
+        context.resetTransform();
+        context.fillStyle = '#b3b9d1';
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+        context.restore();
     }
 }
 
