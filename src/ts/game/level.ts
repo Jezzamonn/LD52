@@ -1,5 +1,6 @@
 import { Point } from "../common";
 import { Entity } from "../entity/entity";
+import { Seed } from "../entity/seed";
 import { Tile, Tiles } from "./tiles";
 
 // Contains everything in one level, including the tiles and the entities.
@@ -23,6 +24,8 @@ export class Level {
         const context = canvas.getContext('2d')!;
         context.drawImage(image, 0, 0, image.width, image.height);
 
+        let startTile: Point | undefined = { x: 0, y: 0}
+
         // Read the pixels. White is empty, black is wall, and the red square is the starting position.
         const imageData = context.getImageData(0, 0, image.width, image.height);
         for (let y = 0; y < image.height; y++) {
@@ -35,12 +38,24 @@ export class Level {
                     this.tiles.setTile({ x, y }, Tile.Wall);
                 }
                 else if (color === 'ff0000') {
-                    this.start = { x, y };
+                    startTile = {x, y};
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
+        }
+
+        if (startTile) {
+            this.start = this.tiles.getTileCoord(startTile, { x: 0.5, y: 1 });
+        }
+
+        // Make player
+        {
+            const seed = new Seed(this);
+            seed.midX = this.start.x;
+            seed.maxY = this.start.y;
+            this.entities.push(seed);
         }
     }
 

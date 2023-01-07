@@ -12,12 +12,11 @@ export class Entity {
     dx = 0;
     dy = 0;
     gravity = 0;
+    xDamp = 0;
     animCount = 0;
     facingDir = FacingDir.Right;
 
     debugColor: string | undefined = '#ff00ff'
-
-
 
     constructor(level: Level) {
         this.level = level;
@@ -31,6 +30,7 @@ export class Entity {
         if (this.debugColor) {
             context.fillStyle = this.debugColor;
             context.fillRect(this.x, this.y, this.w, this.h);
+            console.log(`Rendering entity at ${this.x}, ${this.y} with size ${this.w}, ${this.h}`);
         }
     }
 

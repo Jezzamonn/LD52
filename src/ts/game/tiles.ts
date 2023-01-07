@@ -48,10 +48,10 @@ export class Tiles {
             y: context.canvas.height,
         });
 
-        const minXTile = Math.floor(gameMinPoint.x / TILE_SIZE_PX);
-        const minYTile = Math.floor(gameMinPoint.y / TILE_SIZE_PX);
-        const maxXTile = Math.floor(gameMaxPoint.x / TILE_SIZE_PX);
-        const maxYTile = Math.floor(gameMaxPoint.y / TILE_SIZE_PX);
+        const minXTile = Math.floor(gameMinPoint.x / TILE_SIZE);
+        const minYTile = Math.floor(gameMinPoint.y / TILE_SIZE);
+        const maxXTile = Math.floor(gameMaxPoint.x / TILE_SIZE);
+        const maxYTile = Math.floor(gameMaxPoint.y / TILE_SIZE);
 
         for (let y = minYTile; y <= maxYTile; y++) {
             for (let x = minXTile; x <= maxXTile; x++) {
@@ -65,7 +65,7 @@ export class Tiles {
         pos: Point,
     ) {
         const tile = this.getTile(pos);
-        const renderPos = {x: pos.x * TILE_SIZE_PX, y: pos.y * TILE_SIZE_PX }
+        const renderPos = {x: pos.x * TILE_SIZE, y: pos.y * TILE_SIZE }
 
         if (tile == Tile.Wall) {
             // Loop through each corner
@@ -116,20 +116,21 @@ export class Tiles {
             renderPos,
         }: { tilePos: Point; subTilePos: Point; renderPos: Point }
     ) {
-        const halfTileSize = TILE_SIZE_PX / 2;
+        const halfTileSizePx = TILE_SIZE_PX / 2;
+        const halfTileSize = TILE_SIZE / 2;
         // Image must be loaded when this is called.
         context.drawImage(
             this.image!,
-            tilePos.x * TILE_SIZE_PX + subTilePos.x * halfTileSize,
-            tilePos.y * TILE_SIZE_PX + subTilePos.y * halfTileSize,
-            halfTileSize,
-            halfTileSize,
+            tilePos.x * TILE_SIZE_PX + subTilePos.x * halfTileSizePx,
+            tilePos.y * TILE_SIZE_PX + subTilePos.y * halfTileSizePx,
+            halfTileSizePx,
+            halfTileSizePx,
             // TODO: I'm not sure about these being in the right coordinate space.
             renderPos.x + subTilePos.x * halfTileSize,
             renderPos.y + subTilePos.y * halfTileSize,
             // +1 is a kludge to avoid gaps between tiles.
-            halfTileSize,
-            halfTileSize
+            halfTileSize + 1,
+            halfTileSize + 1
         );
     }
 
@@ -152,6 +153,13 @@ export class Tiles {
             x: Math.floor(p.x / TILE_SIZE),
             y: Math.floor(p.y / TILE_SIZE),
         });
+    }
+
+    getTileCoord(p: Point, positionInTile: Point): Point {
+        return {
+            x: p.x * TILE_SIZE + (TILE_SIZE - 1) * positionInTile.x,
+            y: p.y * TILE_SIZE + (TILE_SIZE - 1) * positionInTile.y,
+        }
     }
 
     static async preload() {

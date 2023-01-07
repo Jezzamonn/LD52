@@ -1,4 +1,4 @@
-import { GAME_HEIGHT_PX, GAME_WIDTH_PX, TIME_STEP } from "../constants";
+import { GAME_HEIGHT, GAME_WIDTH, TIME_STEP } from "../constants";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { Level } from "./level";
@@ -10,8 +10,6 @@ export class Game {
     context: CanvasRenderingContext2D;
 
     scale = 1;
-    xMargin = 0;
-    yMargin = 0;
 
     simulatedTimeMs: number | undefined;
 
@@ -72,7 +70,6 @@ export class Game {
 
     render() {
         this.context.resetTransform();
-        this.context.translate(-this.xMargin, -this.yMargin);
         this.context.scale(this.scale, this.scale);
 
         this.curLevel?.render(this.context);
@@ -83,14 +80,11 @@ export class Game {
         const windowHeight = window.innerHeight;
         const pixelScale = window.devicePixelRatio || 1;
 
-        const xScale = windowWidth / GAME_WIDTH_PX;
-        const yScale = windowHeight / GAME_HEIGHT_PX;
+        const xScale = windowWidth / GAME_WIDTH;
+        const yScale = windowHeight / GAME_HEIGHT;
 
         // Math.min = scale to fit
         this.scale = Math.min(xScale, yScale) * pixelScale;
-        console.log(`Scale: ${this.scale}`);
-        // this.xMargin = (windowWidth - this.canvas.width * this.scale) / 2;
-        // this.yMargin = (windowHeight - this.canvas.height * this.scale) / 2;
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;
