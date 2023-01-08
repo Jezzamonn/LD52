@@ -6,7 +6,7 @@ interface SoundInfo {
     loadPromise?: Promise<void>;
 }
 
-enum MuteState {
+export enum MuteState {
     PLAY_ALL = 0,
     MUSIC_OFF = 1,
     ALL_OFF = 2,
@@ -57,6 +57,18 @@ class _Sounds {
             audio.src = audioPath;
         });
         return promise;
+    }
+
+    addLoadedSound({name, audio}: {name: string, audio: HTMLAudioElement}) {
+        if (this.audios.hasOwnProperty(name)) {
+            throw new Error(`Already loaded sound ${name}.`);
+        }
+
+        this.audios[name] = {
+            loaded: true,
+            audio,
+            loadPromise: Promise.resolve(),
+        };
     }
 
     playSound(name: string, {volume = 1}: {volume?: number} = {}) {
@@ -179,8 +191,7 @@ class _Sounds {
     toggleMute() {
         switch (this.muteState) {
             case MuteState.PLAY_ALL:
-                // Skip the music off state.
-                this.muteState = MuteState.ALL_OFF;
+                this.muteState = MuteState.MUSIC_OFF;
                 break;
             case MuteState.MUSIC_OFF:
                 this.muteState = MuteState.ALL_OFF;

@@ -530,23 +530,27 @@ export function drawAnimation({
 /**
  * Figures out which frame of the animation we should draw.
  */
-function getFrame(
-    imageData: ImageMetadata,
+export function getFrame(
+    image: string | ImageMetadata,
     animationName: string,
     time: number,
-    loop: boolean
+    loop: boolean = true
 ) {
-    if (!imageData.frames) {
+    if (typeof image === "string") {
+        image = images[image];
+    }
+
+    if (!image.frames) {
         return -1;
     }
-    const animData = imageData.animations[animationName];
+    const animData = image.animations[animationName];
     if (!loop) {
         time = Math.min(time, animData.length / 1000 - 1);
     }
     const localTimeMs = (1000 * time) % animData.length;
     let cumulativeTimeMs = 0;
     for (let i = animData.from; i <= animData.to; i++) {
-        cumulativeTimeMs += imageData.frames[i].duration;
+        cumulativeTimeMs += image.frames[i].duration;
         if (cumulativeTimeMs > localTimeMs) {
             return i;
         }
@@ -572,6 +576,7 @@ export const Aseprite = {
     drawAnimation,
     disableSmoothing,
     applyFilter,
+    getFrame,
     get images() {
         return images;
     },

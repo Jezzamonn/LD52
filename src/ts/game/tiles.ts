@@ -24,6 +24,8 @@ export class Tiles {
     x = 0;
     y = 0;
 
+    animCount = 0;
+
     image: HTMLImageElement | undefined;
 
     constructor(w: number, h: number) {
@@ -41,6 +43,10 @@ export class Tiles {
             this.tiles[y][0] = Tile.Wall;
             this.tiles[y][this.w - 1] = Tile.Wall;
         }
+    }
+
+    update(dt: number) {
+        this.animCount += dt;
     }
 
     render(context: CanvasRenderingContext2D) {
@@ -141,6 +147,17 @@ export class Tiles {
                 }
             );
         } else if (tile == Tile.Glow) {
+            // Aseprite.drawAnimation({
+            //     context,
+            //     image: 'glow',
+            //     animationName: 'idle',
+            //     time: this.animCount,
+            //     position: {
+            //         x: renderPos.x,// + TILE_SIZE / 2,
+            //         y: renderPos.y,// + TILE_SIZE,
+            //     },
+            //     anchorRatios: { x: 0.5, y: 1 },
+            // })
             // this.drawTile(
             //     context,
             //     {

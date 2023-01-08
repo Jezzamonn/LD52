@@ -9,6 +9,7 @@ import { centerCanvas } from "./camera";
 import { Level } from "./level";
 import { Levels, LEVELS } from "./levels";
 import { SeedPicker } from "./seedpicker";
+import { SFX } from "./sfx";
 import { Tiles } from "./tiles";
 
 export class Game {
@@ -207,5 +208,6 @@ export class Game {
             Seed.preload(),
             Sprite.preload(),
         ]);
+        SFX.preload();
     }
 }

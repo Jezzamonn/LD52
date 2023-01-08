@@ -1,9 +1,11 @@
 import { FacingDir } from "../common";
-import { FPS, physFromPx, PHYSICS_SCALE, TILE_SIZE } from "../constants";
+import { FPS, physFromPx, PHYSICS_SCALE, rng, TILE_SIZE } from "../constants";
 import { Level } from "../game/level";
+import { SFX } from "../game/sfx";
 import { Tile } from "../game/tiles";
 import { Aseprite } from "../lib/aseprite";
 import { NullKeys } from "../lib/keys";
+import { Sounds } from "../lib/sounds";
 import { lerp } from "../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
@@ -67,7 +69,7 @@ export class Seed extends Entity {
         this.gravity = 0.13 * PHYSICS_SCALE * FPS * FPS
     }
 
-    render(context: CanvasRenderingContext2D) {
+    getAnimationName() {
         let animName = 'stand';
         let loop = true;
 
@@ -94,6 +96,11 @@ export class Seed extends Entity {
         } else if (Math.abs(this.dx) > 0.01) {
             animName = 'run';
         }
+        return { animName, loop }
+    }
+
+    render(context: CanvasRenderingContext2D) {
+        const {animName, loop} = this.getAnimationName();
 
         let filter = Seeds.getFilter(this.type);
 
@@ -127,7 +134,20 @@ export class Seed extends Entity {
     }
 
     update(dt: number) {
+        const prevAnimCount = this.animCount;
         this.animCount += dt;
+
+        const { animName, loop } = this.getAnimationName();
+        if (animName == 'run') {
+            // SFX.play('walk');
+            const startFrame = Aseprite.getFrame('seed', 'run', 0)
+
+            const prevFrame = Aseprite.getFrame('seed', 'run', prevAnimCount);
+            const frame = Aseprite.getFrame('seed', 'run', this.animCount);
+            if (prevFrame != frame && (frame == startFrame + 1 || frame == startFrame + 3)) {
+                SFX.play('walk');
+            }
+        }
 
         let keys = this.controlledByPlayer ? this.level.game.keysForEntity : new NullKeys();
 
@@ -166,6 +186,21 @@ export class Seed extends Entity {
         this.applyGravity(dt);
         this.moveX(dt);
         this.moveY(dt);
+    }
+
+    applyGravity(dt: number): void {
+        // if (!this.level.game.keys.anyIsPressed(JUMP_KEYS)) {
+        //     this.dy += 2 * this.gravity * dt;
+        //     return;
+        // }
+        this.dy += this.gravity * dt;
+    }
+
+    onDownCollision() {
+        if (this.dy > 0.5 * this.jumpSpeed) {
+            SFX.play('land');
+        }
+        super.onDownCollision();
     }
 
     grow() {
