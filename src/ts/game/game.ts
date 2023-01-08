@@ -8,6 +8,12 @@ import { centerCanvas } from "./camera";
 import { Level } from "./level";
 import { Tiles } from "./tiles";
 
+const LEVELS = [
+    'flower',
+    'use-vine',
+    'vine-misdirection',
+]
+
 export class Game {
 
     canvas: HTMLCanvasElement;
@@ -17,6 +23,7 @@ export class Game {
 
     simulatedTimeMs: number | undefined;
 
+    levelIndex = 0;
     curLevel: Level | undefined;
     keys: RegularKeys;
 
@@ -36,8 +43,8 @@ export class Game {
     start() {
         this.keys.setUp();
 
-        const level = new Level(this);
-        level.initFromImage(Images.images['level1'].image!);
+        const level = new Level(this, LEVELS[this.levelIndex]);
+        level.initFromImage();
         this.curLevel = level;
 
         Aseprite.disableSmoothing(this.context);
@@ -46,6 +53,17 @@ export class Game {
         window.addEventListener('resize', () => this.resize());
 
         this.doAnimationLoop();
+    }
+
+    nextLevel() {
+        this.levelIndex++;
+        if (this.levelIndex >= LEVELS.length) {
+            this.levelIndex = 0;
+        }
+
+        const level = new Level(this, LEVELS[this.levelIndex]);
+        level.initFromImage();
+        this.curLevel = level;
     }
 
     doAnimationLoop() {
@@ -72,14 +90,23 @@ export class Game {
         requestAnimationFrame(() => this.doAnimationLoop());
     }
 
+    debugInput() {
+        if (this.keys.wasPressedThisFrame('Period')) {
+            this.nextLevel();
+        }
+    }
+
     update(dt: number) {
         try {
+            this.debugInput();
+
             this.curLevel?.update(dt);
+
+            this.keys.resetFrame();
         }
         catch (e) {
             console.error(e);
         }
-        this.keys.resetFrame();
     }
 
     render() {
@@ -115,8 +142,14 @@ export class Game {
     }
 
     static async preload() {
+        const levelPromises: Promise<any>[] = [];
+        for (const level of LEVELS) {
+            levelPromises.push(
+                Images.loadImage({name: level, path: 'level/', extension: 'gif'})
+            );
+        }
         await Promise.all([
-            Images.loadImage({name: 'level1', path: 'level/', extension: 'gif'}),
+            ...levelPromises,
             Tiles.preload(),
             Seed.preload(),
             Sprite.preload(),

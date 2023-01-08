@@ -6,6 +6,7 @@ import { Aseprite } from "../lib/aseprite";
 import { NullKeys } from "../lib/keys";
 import { lerp } from "../lib/util";
 import { Entity } from "./entity";
+import { Sprite } from "./sprite";
 
 const LEFT_KEYS = ['a', 'ArrowLeft'];
 const RIGHT_KEYS = ['d', 'ArrowRight'];
@@ -13,9 +14,19 @@ const JUMP_KEYS = ['w', 'ArrowUp'];
 const PLANT_KEYS = ['s', 'ArrowDown'];
 
 export enum SeedType {
-    Vine = 'vine',
-    Dirt = 'dirt',
-    Bomb = 'bomb',
+    Vine,
+    Dirt,
+    Bomb,
+    Flower,
+}
+
+export class Seeds {
+    static nextSeed(s: SeedType): SeedType {
+        if (s == SeedType.Flower) {
+            return SeedType.Vine;
+        }
+        return s + 1;
+    }
 }
 
 export class Seed extends Entity {
@@ -72,10 +83,13 @@ export class Seed extends Entity {
             case SeedType.Vine:
                 break;
             case SeedType.Dirt:
-                filter = 'hue-rotate(90deg)';
+                filter = 'hue-rotate(-100deg) saturate(0.3)';
                 break;
             case SeedType.Bomb:
-                filter = 'hue-rotate(180deg)';
+                filter = 'hue-rotate(-30deg) saturate(1.5)';
+                break;
+            case SeedType.Flower:
+                filter = 'hue-rotate(180deg) saturate(1.1)';
                 break;
         }
 
@@ -166,6 +180,9 @@ export class Seed extends Entity {
             case SeedType.Bomb:
                 this.explode();
                 break;
+            case SeedType.Flower:
+                this.tryGrowFlower();
+                break;
         }
     }
 
@@ -184,6 +201,19 @@ export class Seed extends Entity {
 
     growDirt() {
         this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.Wall);
+    }
+
+    tryGrowFlower() {
+        if (this.isTouchingTile(Tile.Glow)) {
+            const flower = new Sprite(this.level, 'flower');
+            flower.midX = this.midX;
+            flower.maxY = this.maxY;
+            this.level.entities.push(flower);
+            return;
+        }
+
+        // Not a glowing place... so it dies :(
+        this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.DeadPlant);
     }
 
     explode() {

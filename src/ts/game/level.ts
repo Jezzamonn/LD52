@@ -3,6 +3,7 @@ import { rng } from "../constants";
 import { Entity } from "../entity/entity";
 import { Seed, SeedType } from "../entity/seed";
 import { Sprite } from "../entity/sprite";
+import { Images } from "../lib/images";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { Tile, Tiles } from "./tiles";
@@ -12,6 +13,7 @@ export class Level {
     game: Game;
     entities: Entity[] = [];
     image: HTMLImageElement | undefined;
+    levelName: string;
 
     camera: FocusCamera = new FocusCamera();
 
@@ -19,11 +21,15 @@ export class Level {
 
     start: Point = { x: 0, y: 0 };
 
-    constructor(game: Game) {
+    won = false;
+
+    constructor(game: Game, levelName: string) {
         this.game = game;
+        this.levelName = levelName;
     }
 
-    initFromImage(image: HTMLImageElement) {
+    initFromImage() {
+        const image = Images.images[this.levelName].image!;
         this.image = image;
         this.entities = [];
         this.tiles = new Tiles(image.width, image.height);
@@ -69,7 +75,7 @@ export class Level {
     }
 
     reset() {
-        this.initFromImage(this.image!);
+        this.initFromImage();
     }
 
     endDay() {
@@ -81,6 +87,15 @@ export class Level {
                 entity.grow();
             }
         }
+
+        // If we grew a flower, we win! Yay.
+        for (const entity of this.entities) {
+            if (entity instanceof Sprite && entity.name == 'flower') {
+                this.won = true;
+                return;
+            }
+        }
+
         this.spawnPlayer();
     }
 
@@ -88,7 +103,7 @@ export class Level {
         const seed = new Seed(this);
         seed.midX = this.start.x;
         seed.maxY = this.start.y;
-        switch (Math.floor(rng() * 3)) {
+        switch (Math.floor(rng() * 4)) {
             case 0:
                 seed.type = SeedType.Vine;
                 break;
@@ -98,16 +113,29 @@ export class Level {
             case 2:
                 seed.type = SeedType.Bomb;
                 break;
+            case 3:
+                seed.type = SeedType.Flower;
+                break;
         }
         this.entities.push(seed);
 
         this.camera.target = () => ({x: seed.midX, y: seed.minY});
     }
 
-    update(dt: number) {
-        if (this.game.keys.anyIsPressed(['KeyR'])) {
+    handleInput() {
+        if (this.game.keys.wasPressedThisFrame('KeyR')) {
             this.reset();
+            return;
         }
+
+        if (this.won && this.game.keys.anyWasPressedThisFrame(['Space', 'Enter'])) {
+            this.game.nextLevel();
+            return;
+        }
+    }
+
+    update(dt: number) {
+        this.handleInput();
 
         for (const entity of this.entities) {
             entity.update(dt);
