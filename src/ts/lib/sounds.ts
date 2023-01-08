@@ -12,6 +12,9 @@ enum MuteState {
     ALL_OFF = 2,
 }
 
+// Playing at 1 volume is too loud.
+const VOLUME_MULTIPLE = 0.5;
+
 class _Sounds {
     audios: {[key: string]: SoundInfo} = {};
 
@@ -20,6 +23,7 @@ class _Sounds {
     muteState = MuteState.PLAY_ALL;
 
     playbackRate = 1;
+    volume = 1;
 
     /**
      * Asynchronously fetches an audio.
@@ -67,7 +71,7 @@ class _Sounds {
         // TODO: Adjust SFX volumes, probably just here.
 
 
-        audio.volume *= volume;
+        audio.volume *= this.volume * volume;
 
         audio.playbackRate = this.playbackRate;
 
@@ -109,7 +113,7 @@ class _Sounds {
             return;
         }
 
-        audio.volume = 0.5;
+        audio.volume = this.volume * VOLUME_MULTIPLE;
         audio.loop = true;
         // Disable type checking on these because not typescript doesn't know about them yet.
         (audio as any).mozPreservesPitch = false;
@@ -134,6 +138,13 @@ class _Sounds {
 
         this.curSong = audio;
         this.curSongName = songName;
+    }
+
+    setVolume(volume: number) {
+        this.volume = volume;
+        if (this.curSong != null) {
+            this.curSong.volume = this.volume * VOLUME_MULTIPLE;
+        }
     }
 
     updatePlaybackRate(desiredRate:number, dt: number) {
@@ -168,7 +179,8 @@ class _Sounds {
     toggleMute() {
         switch (this.muteState) {
             case MuteState.PLAY_ALL:
-                this.muteState = MuteState.MUSIC_OFF;
+                // Skip the music off state.
+                this.muteState = MuteState.ALL_OFF;
                 break;
             case MuteState.MUSIC_OFF:
                 this.muteState = MuteState.ALL_OFF;

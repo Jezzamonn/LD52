@@ -1,5 +1,6 @@
 import { Seeds, SeedType } from "../entity/seed";
 import { Aseprite, images } from "../lib/aseprite";
+import { Sounds } from "../lib/sounds";
 
 export class SeedPicker {
 
@@ -25,11 +26,13 @@ export class SeedPicker {
     show() {
         this.elem.classList.remove('seed-picker__closed');
         this.shown = true;
+        Sounds.setVolume(0.5);
     }
 
     hide() {
         this.elem.classList.add('seed-picker__closed');
         this.shown = false;
+        Sounds.setVolume(1);
     }
 
     clearButtons() {

@@ -4,6 +4,7 @@ import { Sprite } from "../entity/sprite";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
+import { Sounds } from "../lib/sounds";
 import { centerCanvas } from "./camera";
 import { Level } from "./level";
 import { Levels, LEVELS } from "./levels";
@@ -45,6 +46,8 @@ export class Game {
 
         this.keys = new KeyboardKeys();
         this.seedPicker = new SeedPicker();
+
+        Sounds.loadMuteState();
     }
 
     start() {
@@ -74,6 +77,7 @@ export class Game {
             this.curLevel!.spawnPlayer(type);
             this.seedPicker.hide();
         }
+        Sounds.startSongIfNotAlreadyPlaying();
     }
 
     nextLevel() {
@@ -82,13 +86,18 @@ export class Game {
 
     startLevel(levelIndex: number) {
         this.levelIndex = levelIndex;
-        const level = new Level(this, LEVELS[this.levelIndex]);
+        const levelInfo = LEVELS[this.levelIndex];
+        const level = new Level(this, levelInfo);
         level.initFromImage();
         this.curLevel = level;
 
         this.seedPicker.setSeedTypes(level.remainingSeeds);
         this.seedPicker.show();
         this.seedPicker.onChoice = (choice) => this.onChoice(choice);
+
+        if (levelInfo.song) {
+            Sounds.setSong(levelInfo.song);
+        }
     }
 
     showPicker() {
@@ -131,8 +140,18 @@ export class Game {
     }
 
     debugInput() {
+        if (this.curLevel!.won && this.keys.anyWasPressedThisFrame(['Space', 'Enter'])) {
+            this.nextLevel();
+        }
         if (this.keys.wasPressedThisFrame('Period')) {
             this.nextLevel();
+        }
+        if (this.keys.wasPressedThisFrame('KeyM')) {
+            // Mute
+            Sounds.toggleMute();
+        }
+        if (this.keys.wasPressedThisFrame('KeyR')) {
+            this.startLevel(this.levelIndex);
         }
     }
 

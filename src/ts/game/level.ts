@@ -78,10 +78,6 @@ export class Level {
         this.camera.target = () => ({x: this.start.x, y: this.start.y});
     }
 
-    reset() {
-        this.initFromImage();
-    }
-
     endDay() {
         // Update the tiles in the level.
         this.tiles.advanceDay();
@@ -115,21 +111,7 @@ export class Level {
         this.camera.target = () => ({x: seed.midX, y: seed.minY});
     }
 
-    handleInput() {
-        if (this.game.keys.wasPressedThisFrame('KeyR')) {
-            this.reset();
-            return;
-        }
-
-        if (this.won && this.game.keys.anyWasPressedThisFrame(['Space', 'Enter'])) {
-            this.game.nextLevel();
-            return;
-        }
-    }
-
     update(dt: number) {
-        this.handleInput();
-
         for (const entity of this.entities) {
             entity.update(dt);
         }
