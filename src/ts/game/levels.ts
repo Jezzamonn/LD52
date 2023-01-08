@@ -13,16 +13,33 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'flower',
         seeds: [SeedType.Flower],
-        song: 'farmin-chords'
+        song: 'farmin-chords',
     },
     {
         name: 'use-vine',
         seeds: [SeedType.Flower, SeedType.Vine],
-        song: 'farmin-default'
     },
     {
         name: 'vine-misdirection',
         seeds: [SeedType.Flower, SeedType.Vine],
+        song: 'farmin-default',
+    },
+    {
+        name: 'explode',
+        seeds: [SeedType.Flower, SeedType.Vine, SeedType.Bomb],
+    },
+    {
+        name: 'explode-and-grow',
+        seeds: [SeedType.Flower, SeedType.Vine, SeedType.Bomb],
+    },
+    {
+        name: 'dirt',
+        seeds: [SeedType.Flower, SeedType.Vine, SeedType.Vine, SeedType.Bomb, SeedType.Dirt],
+    },
+    {
+        name: 'win',
+        seeds: [SeedType.Flower, SeedType.Flower, SeedType.Flower, SeedType.Flower, SeedType.Flower, SeedType.Flower, SeedType.Vine, SeedType.Vine, SeedType.Vine, SeedType.Bomb, SeedType.Bomb, SeedType.Bomb, SeedType.Bomb, SeedType.Dirt, SeedType.Dirt, SeedType.Dirt, SeedType.Dirt, SeedType.Dirt, ],
+        song: 'farmin-alt-chords',
     },
 ]
 

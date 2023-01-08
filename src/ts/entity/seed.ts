@@ -35,7 +35,7 @@ export class Seeds {
             case SeedType.Dirt:
                 return 'hue-rotate(-100deg) saturate(0.3)';
             case SeedType.Bomb:
-                return 'hue-rotate(-30deg) saturate(1.5)';
+                return 'hue-rotate(-30deg) saturate(2)';
             case SeedType.Flower:
                 return 'hue-rotate(180deg) saturate(1.1)';
         }
