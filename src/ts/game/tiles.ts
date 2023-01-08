@@ -1,5 +1,5 @@
 import { Point } from "../common";
-import { PHYSICS_SCALE, TILE_SIZE, TILE_SIZE_PX } from "../constants";
+import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../constants";
 import { Aseprite, images } from "../lib/aseprite";
 import { Images } from "../lib/images";
 
@@ -9,6 +9,7 @@ export enum Tile {
     Plant = 2,
     PlantTop = 3,
     DeadPlant = 4,
+    Glow = 5,
 }
 
 /**
@@ -139,6 +140,14 @@ export class Tiles {
                     renderPos
                 }
             );
+        } else if (tile == Tile.Glow) {
+            // this.drawTile(
+            //     context,
+            //     {
+            //         tilePos: { x: Math.floor(2 * rng()), y: Math.floor(4 * rng()) },
+            //         renderPos,
+            //     }
+            // );
         }
         // TODO maybe: little grass spikes? idk
     }

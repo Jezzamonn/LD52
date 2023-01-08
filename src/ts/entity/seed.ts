@@ -35,6 +35,8 @@ export class Seed extends Entity {
         super(level);
         this.w = physFromPx(10);
         this.h = physFromPx(12);
+
+        this.gravity = 0.13 * PHYSICS_SCALE * FPS * FPS
     }
 
     render(context: CanvasRenderingContext2D) {

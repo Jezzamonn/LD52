@@ -1,0 +1,32 @@
+{ "frames": [
+   {
+    "filename": "glow 0.aseprite",
+    "frame": { "x": 1, "y": 1, "w": 14, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 14, "h": 8 },
+    "sourceSize": { "w": 14, "h": 8 },
+    "duration": 300
+   },
+   {
+    "filename": "glow 1.aseprite",
+    "frame": { "x": 1, "y": 9, "w": 14, "h": 8 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 14, "h": 8 },
+    "sourceSize": { "w": 14, "h": 8 },
+    "duration": 300
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.40-x64",
+  "image": "glow.png",
+  "format": "RGBA8888",
+  "size": { "w": 16, "h": 66 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "idle", "from": 0, "to": 1, "direction": "forward" }
+  ]
+ }
+}

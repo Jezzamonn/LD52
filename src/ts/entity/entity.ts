@@ -13,7 +13,7 @@ export class Entity {
     dx = 0;
     dy = 0;
     // Copying some constants from Dogs++. Will they work here? idk.
-    gravity = 0.13 * PHYSICS_SCALE * FPS * FPS;
+    gravity = 0;
     xDampAmt = (1 / 8) * PHYSICS_SCALE * FPS * FPS;
     animCount = 0;
     facingDir = FacingDir.Right;

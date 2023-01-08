@@ -1,0 +1,23 @@
+{ "frames": [
+   {
+    "filename": "flower.aseprite",
+    "frame": { "x": 1, "y": 1, "w": 18, "h": 22 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 18, "h": 22 },
+    "sourceSize": { "w": 18, "h": 22 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.2.40-x64",
+  "image": "flower.png",
+  "format": "RGBA8888",
+  "size": { "w": 20, "h": 66 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "idle", "from": 0, "to": 0, "direction": "forward" }
+  ]
+ }
+}

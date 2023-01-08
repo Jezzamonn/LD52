@@ -1,5 +1,6 @@
 import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, TIME_STEP } from "../constants";
 import { Seed } from "../entity/seed";
+import { Sprite } from "../entity/sprite";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { KeyboardKeys, RegularKeys } from "../lib/keys";
@@ -118,6 +119,7 @@ export class Game {
             Images.loadImage({name: 'level1', path: 'level/', extension: 'gif'}),
             Tiles.preload(),
             Seed.preload(),
+            Sprite.preload(),
         ]);
     }
 }

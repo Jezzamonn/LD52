@@ -2,6 +2,7 @@ import { Point } from "../common";
 import { rng } from "../constants";
 import { Entity } from "../entity/entity";
 import { Seed, SeedType } from "../entity/seed";
+import { Sprite } from "../entity/sprite";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { Tile, Tiles } from "./tiles";
@@ -34,12 +35,13 @@ export class Level {
         const context = canvas.getContext('2d')!;
         context.drawImage(image, 0, 0, image.width, image.height);
 
-        let startTile: Point | undefined = { x: 0, y: 0}
-
         // Read the pixels. White is empty, black is wall, and the red square is the starting position.
         const imageData = context.getImageData(0, 0, image.width, image.height);
         for (let y = 0; y < image.height; y++) {
             for (let x = 0; x < image.width; x++) {
+
+                const basePos = this.tiles.getTileCoord({x, y}, { x: 0.5, y: 1 })
+
                 const color = pixelToColorString(imageData, x, y);
                 if (color === 'ffffff') {
                     this.tiles.setTile({ x, y }, Tile.Empty);
@@ -47,17 +49,20 @@ export class Level {
                 else if (color === '000000') {
                     this.tiles.setTile({ x, y }, Tile.Wall);
                 }
+                else if (color === 'ffff00') {
+                    this.tiles.setTile({ x, y }, Tile.Glow);
+                    const glow = new Sprite(this, 'glow');
+                    glow.midX = basePos.x;
+                    glow.maxY = basePos.y;
+                    this.entities.push(glow);
+                }
                 else if (color === 'ff0000') {
-                    startTile = {x, y};
+                    this.start = basePos;
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
-        }
-
-        if (startTile) {
-            this.start = this.tiles.getTileCoord(startTile, { x: 0.5, y: 1 });
         }
 
         this.spawnPlayer();
