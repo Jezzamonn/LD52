@@ -6,6 +6,7 @@ import { Sprite } from "../entity/sprite";
 import { Images } from "../lib/images";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
+import { LevelInfo } from "./levels";
 import { Tile, Tiles } from "./tiles";
 
 // Contains everything in one level, including the tiles and the entities.
@@ -13,7 +14,8 @@ export class Level {
     game: Game;
     entities: Entity[] = [];
     image: HTMLImageElement | undefined;
-    levelName: string;
+    levelInfo: LevelInfo
+    remainingSeeds: SeedType[] = [];
 
     camera: FocusCamera = new FocusCamera();
 
@@ -23,13 +25,13 @@ export class Level {
 
     won = false;
 
-    constructor(game: Game, levelName: string) {
+    constructor(game: Game, levelInfo: LevelInfo) {
         this.game = game;
-        this.levelName = levelName;
+        this.levelInfo = levelInfo;
     }
 
     initFromImage() {
-        const image = Images.images[this.levelName].image!;
+        const image = Images.images[this.levelInfo.name].image!;
         this.image = image;
         this.entities = [];
         this.tiles = new Tiles(image.width, image.height);
@@ -71,7 +73,9 @@ export class Level {
             }
         }
 
-        this.spawnPlayer();
+        this.remainingSeeds = this.levelInfo.seeds.slice();
+
+        this.camera.target = () => ({x: this.start.x, y: this.start.y});
     }
 
     reset() {
@@ -92,32 +96,21 @@ export class Level {
         for (const entity of this.entities) {
             if (entity instanceof Sprite && entity.name == 'flower') {
                 this.won = true;
-                return;
             }
         }
 
-        this.spawnPlayer();
+        this.game.showPicker();
     }
 
-    spawnPlayer() {
+    spawnPlayer(seedType: SeedType) {
         const seed = new Seed(this);
         seed.midX = this.start.x;
         seed.maxY = this.start.y;
-        switch (Math.floor(rng() * 4)) {
-            case 0:
-                seed.type = SeedType.Vine;
-                break;
-            case 1:
-                seed.type = SeedType.Dirt;
-                break;
-            case 2:
-                seed.type = SeedType.Bomb;
-                break;
-            case 3:
-                seed.type = SeedType.Flower;
-                break;
-        }
+        seed.type = seedType;
         this.entities.push(seed);
+
+        // Remove this seed as an option.
+        this.remainingSeeds.splice(this.remainingSeeds.indexOf(seedType), 1);
 
         this.camera.target = () => ({x: seed.midX, y: seed.minY});
     }

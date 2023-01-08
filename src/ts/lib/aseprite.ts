@@ -239,17 +239,22 @@ function applyEffect(
 
     const canvas = effectFn(baseImageMetadata.image);
 
-    const image = new Image();
-    // Even though we're setting the source from a data url, it still needs to load.
-    image.onload = () => {
-        images[newName].image = image;
-        images[newName].imageLoaded = true;
-        images[newName].loaded = true;
-    };
-    image.onerror = () => {
-        throw new Error(`Error loading image ${name}.`);
-    };
-    image.src = canvas.toDataURL();
+    const imageLoadedPromise = new Promise<void>((resolve, reject) => {
+        const image = new Image();
+        // Even though we're setting the source from a data url, it still needs to load.
+        image.onload = () => {
+            images[newName].image = image;
+            images[newName].imageLoaded = true;
+            images[newName].loaded = true;
+            resolve();
+        };
+        image.onerror = () => {
+            reject(`Error loading image ${newName}.`);
+        };
+        image.src = canvas.toDataURL();
+    });
+
+    images[newName].loadPromise = imageLoadedPromise.then(() => images[newName]);
 
     return images[newName];
 }
@@ -566,6 +571,7 @@ export const Aseprite = {
     drawSprite,
     drawAnimation,
     disableSmoothing,
+    applyFilter,
     get images() {
         return images;
     },

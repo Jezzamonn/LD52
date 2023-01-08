@@ -27,6 +27,23 @@ export class Seeds {
         }
         return s + 1;
     }
+
+    static getFilter(s: SeedType) {
+        switch (s) {
+            case SeedType.Vine:
+                return '';
+            case SeedType.Dirt:
+                return 'hue-rotate(-100deg) saturate(0.3)';
+            case SeedType.Bomb:
+                return 'hue-rotate(-30deg) saturate(1.5)';
+            case SeedType.Flower:
+                return 'hue-rotate(180deg) saturate(1.1)';
+        }
+    }
+
+    static randomSeed(): SeedType {
+        return Math.floor(Math.random() * 4);
+    }
 }
 
 export class Seed extends Entity {
@@ -78,20 +95,7 @@ export class Seed extends Entity {
             animName = 'run';
         }
 
-        let filter = '';
-        switch (this.type) {
-            case SeedType.Vine:
-                break;
-            case SeedType.Dirt:
-                filter = 'hue-rotate(-100deg) saturate(0.3)';
-                break;
-            case SeedType.Bomb:
-                filter = 'hue-rotate(-30deg) saturate(1.5)';
-                break;
-            case SeedType.Flower:
-                filter = 'hue-rotate(180deg) saturate(1.1)';
-                break;
-        }
+        let filter = Seeds.getFilter(this.type);
 
         Aseprite.drawAnimation({
             context,
@@ -125,7 +129,7 @@ export class Seed extends Entity {
     update(dt: number) {
         this.animCount += dt;
 
-        let keys = this.controlledByPlayer ? this.level.game.keys : new NullKeys();
+        let keys = this.controlledByPlayer ? this.level.game.keysForEntity : new NullKeys();
 
         if (this.planting) {
             const updateAmt = 1 - Math.exp(-5 * dt);

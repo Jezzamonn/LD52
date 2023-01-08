@@ -1,18 +1,14 @@
 import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, TIME_STEP } from "../constants";
-import { Seed } from "../entity/seed";
+import { Seed, SeedType } from "../entity/seed";
 import { Sprite } from "../entity/sprite";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
-import { KeyboardKeys, RegularKeys } from "../lib/keys";
+import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";
 import { centerCanvas } from "./camera";
 import { Level } from "./level";
+import { Levels, LEVELS } from "./levels";
+import { SeedPicker } from "./seedpicker";
 import { Tiles } from "./tiles";
-
-const LEVELS = [
-    'flower',
-    'use-vine',
-    'vine-misdirection',
-]
 
 export class Game {
 
@@ -25,7 +21,17 @@ export class Game {
 
     levelIndex = 0;
     curLevel: Level | undefined;
+    seedPicker: SeedPicker;
+
     keys: RegularKeys;
+    nullKeys = new NullKeys();
+
+    get keysForEntity() {
+        if (this.seedPicker.shown) {
+            return this.nullKeys;
+        }
+        return this.keys;
+    }
 
     constructor(canvasSelector: string) {
         const canvas = document.querySelector<HTMLCanvasElement>(canvasSelector);
@@ -38,14 +44,11 @@ export class Game {
         this.context = context;
 
         this.keys = new KeyboardKeys();
+        this.seedPicker = new SeedPicker();
     }
 
     start() {
         this.keys.setUp();
-
-        const level = new Level(this, LEVELS[this.levelIndex]);
-        level.initFromImage();
-        this.curLevel = level;
 
         Aseprite.disableSmoothing(this.context);
 
@@ -53,17 +56,54 @@ export class Game {
         window.addEventListener('resize', () => this.resize());
 
         this.doAnimationLoop();
+
+        this.startLevel(this.levelIndex);
+    }
+
+    onChoice(type: SeedType | string) {
+        // Handle string types
+        if (typeof type === 'string') {
+            if (type === 'next') {
+                this.nextLevel();
+            }
+            else if (type === 'retry') {
+                this.startLevel(this.levelIndex);
+            }
+        }
+        else {
+            this.curLevel!.spawnPlayer(type);
+            this.seedPicker.hide();
+        }
     }
 
     nextLevel() {
-        this.levelIndex++;
-        if (this.levelIndex >= LEVELS.length) {
-            this.levelIndex = 0;
-        }
+        this.startLevel((this.levelIndex + 1) % LEVELS.length);
+    }
 
+    startLevel(levelIndex: number) {
+        this.levelIndex = levelIndex;
         const level = new Level(this, LEVELS[this.levelIndex]);
         level.initFromImage();
         this.curLevel = level;
+
+        this.seedPicker.setSeedTypes(level.remainingSeeds);
+        this.seedPicker.show();
+        this.seedPicker.onChoice = (choice) => this.onChoice(choice);
+    }
+
+    showPicker() {
+        if (this.curLevel!.won) {
+            this.seedPicker.setSeedTypes(['next']);
+            this.seedPicker.show();
+        }
+        else if (this.curLevel!.remainingSeeds.length == 0) {
+            this.seedPicker.setSeedTypes(['retry']);
+            this.seedPicker.show();
+        }
+        else {
+            this.seedPicker.setSeedTypes(this.curLevel!.remainingSeeds);
+            this.seedPicker.show();
+        }
     }
 
     doAnimationLoop() {
@@ -142,14 +182,8 @@ export class Game {
     }
 
     static async preload() {
-        const levelPromises: Promise<any>[] = [];
-        for (const level of LEVELS) {
-            levelPromises.push(
-                Images.loadImage({name: level, path: 'level/', extension: 'gif'})
-            );
-        }
         await Promise.all([
-            ...levelPromises,
+            Levels.preload(),
             Tiles.preload(),
             Seed.preload(),
             Sprite.preload(),

@@ -10,3 +10,53 @@ html, body {
 .hidden {
     display: none;
 }
+
+.seed-picker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    transition: top 0.5s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.seeds {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.seed-picker__closed {
+    top: 100vh;
+}
+
+.seed-button {
+    flex: 1;
+    text-decoration: none;
+    border: none;
+    background: none;
+
+    max-width: 50vw;
+    max-height: 50vh;
+
+    // This isn't working :(
+    // transition: transform 1s ease;
+
+    :hover, :focus {
+        transform: scale(1.1);
+    }
+}
+
+.seed-button-image {
+    width: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
