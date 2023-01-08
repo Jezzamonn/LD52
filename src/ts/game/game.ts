@@ -76,7 +76,7 @@ export class Game {
             this.curLevel?.update(dt);
         }
         catch (e) {
-            // Do nothing.
+            console.error(e);
         }
         this.keys.resetFrame();
     }
@@ -90,7 +90,7 @@ export class Game {
             this.curLevel?.render(this.context);
         }
         catch (e) {
-            // Do nothing
+            console.error(e);
         }
     }
 

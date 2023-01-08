@@ -18,6 +18,7 @@ export class Entity {
     animCount = 0;
     facingDir = FacingDir.Right;
     canCollide = true;
+    done = false;
 
     debugColor: string | undefined = '#ff00ff'
 
@@ -76,6 +77,7 @@ export class Entity {
     }
 
     moveY(dt: number) {
+        const wasTouchingPlantTop = this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down });
         this.y += this.dy * dt;
 
         this.y = Math.round(this.y);
@@ -90,6 +92,9 @@ export class Entity {
             }
         } else if (this.dy > 0) {
             if (this.isTouchingTile(Tile.Wall, { dir: Dir.Down })) {
+                this.onDownCollision();
+            }
+            if (!wasTouchingPlantTop && this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down })) {
                 this.onDownCollision();
             }
         }
@@ -123,20 +128,30 @@ export class Entity {
         this.dy = 0;
     }
 
-    isTouchingTile(tile: Tile, { dir = undefined, offset = undefined } : { dir?: Dir, offset?: Point } = {}): boolean {
+    isTouchingTile(tile: Tile | Tile[], { dir = undefined, offset = undefined } : { dir?: Dir, offset?: Point } = {}): boolean {
+        if (!Array.isArray(tile)) {
+            tile = [tile];
+        }
         const corners = Dirs.cornersInDirection(dir);
         for (const corner of corners) {
             const x = this.x + corner.x * this.w + (offset?.x ?? 0);
             const y = this.y + corner.y * this.h + (offset?.y ?? 0);
-            if (this.level.tiles.getTileAtCoord({x, y}) === tile) {
-                return true;
+            for (const t of tile) {
+                if (this.level.tiles.getTileAtCoord({x, y}) === t) {
+                    return true;
+                }
             }
         }
         return false
     }
 
+    isStanding(): boolean {
+        return this.isTouchingTile([Tile.Wall, Tile.PlantTop], { dir: Dir.Down, offset: { x: 0, y: 1 } }) &&
+            !this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down })
+    }
+
     isOnGround(): boolean {
-        return this.isTouchingTile(Tile.Wall, { dir: Dir.Down, offset: { x: 0, y: 1 } });
+        return this.isTouchingTile(Tile.Wall, { dir: Dir.Down, offset: { x: 0, y: 1 } })
     }
 
     isTouchingEntity(other: Entity): boolean {

@@ -1,6 +1,7 @@
 import { Point } from "../common";
+import { rng } from "../constants";
 import { Entity } from "../entity/entity";
-import { Seed } from "../entity/seed";
+import { Seed, SeedType } from "../entity/seed";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { Tile, Tiles } from "./tiles";
@@ -9,6 +10,7 @@ import { Tile, Tiles } from "./tiles";
 export class Level {
     game: Game;
     entities: Entity[] = [];
+    image: HTMLImageElement | undefined;
 
     camera: FocusCamera = new FocusCamera();
 
@@ -21,6 +23,7 @@ export class Level {
     }
 
     initFromImage(image: HTMLImageElement) {
+        this.image = image;
         this.entities = [];
         this.tiles = new Tiles(image.width, image.height);
 
@@ -60,19 +63,57 @@ export class Level {
         this.spawnPlayer();
     }
 
+    reset() {
+        this.initFromImage(this.image!);
+    }
+
+    endDay() {
+        // Update the tiles in the level.
+        this.tiles.advanceDay();
+
+        for (const entity of this.entities) {
+            if (entity instanceof Seed && entity.planting == true) {
+                entity.grow();
+            }
+        }
+        this.spawnPlayer();
+    }
+
     spawnPlayer() {
         const seed = new Seed(this);
         seed.midX = this.start.x;
         seed.maxY = this.start.y;
+        switch (Math.floor(rng() * 3)) {
+            case 0:
+                seed.type = SeedType.Vine;
+                break;
+            case 1:
+                seed.type = SeedType.Dirt;
+                break;
+            case 2:
+                seed.type = SeedType.Bomb;
+                break;
+        }
         this.entities.push(seed);
 
         this.camera.target = () => ({x: seed.midX, y: seed.minY});
     }
 
     update(dt: number) {
+        if (this.game.keys.anyIsPressed(['KeyR'])) {
+            this.reset();
+        }
+
         for (const entity of this.entities) {
             entity.update(dt);
         }
+
+        for (let i = this.entities.length - 1; i >= 0; i--) {
+            if (this.entities[i].done) {
+                this.entities.splice(i, 1);
+            }
+        }
+
         this.camera.update(dt);
     }
 

@@ -6,6 +6,9 @@ import { Images } from "../lib/images";
 export enum Tile {
     Empty = 0,
     Wall = 1,
+    Plant = 2,
+    PlantTop = 3,
+    DeadPlant = 4,
 }
 
 /**
@@ -16,19 +19,26 @@ export class Tiles {
 
     w = 0;
     h = 0;
+    // Index of the top left corner of this level. Can move when the level grows.
+    x = 0;
+    y = 0;
 
     image: HTMLImageElement | undefined;
 
     constructor(w: number, h: number) {
-        this.w = w;
-        this.h = h;
+        this.w = w + 2;
+        this.h = h + 2;
+        this.x = 1;
+        this.y = 1;
 
-        // Fill with empty
-        for (let y = 0; y < h; y++) {
+        // Fill with mostly empty, a floor and some walls.
+        for (let y = 0; y < this.h; y++) {
             this.tiles[y] = [];
-            for (let x = 0; x < w; x++) {
-                this.tiles[y][x] = Tile.Empty;
+            for (let x = 0; x < this.w; x++) {
+                this.tiles[y][x] = y == (this.h - 1) ? Tile.Wall : Tile.Empty;
             }
+            this.tiles[y][0] = Tile.Wall;
+            this.tiles[y][this.w - 1] = Tile.Wall;
         }
     }
 
@@ -95,7 +105,7 @@ export class Tiles {
                             tilePos = { x: 0, y: 0 };
                         }
                     }
-                    this.drawFromTileSet(
+                    this.drawQuarterTile(
                         context,
                         {
                             tilePos,
@@ -105,10 +115,78 @@ export class Tiles {
                     );
                 }
             }
+        } else if (tile == Tile.Plant) {
+            this.drawTile(
+                context,
+                {
+                    tilePos: { x: 1, y: 2 },
+                    renderPos
+                }
+            );
+        } else if (tile == Tile.PlantTop) {
+            this.drawTile(
+                context,
+                {
+                    tilePos: { x: 1, y: 1 },
+                    renderPos
+                }
+            );
+        } else if (tile == Tile.DeadPlant) {
+            this.drawTile(
+                context,
+                {
+                    tilePos: { x: 2, y: 2 },
+                    renderPos
+                }
+            );
+        }
+        // TODO maybe: little grass spikes? idk
+    }
+
+    advanceDay() {
+        for (let y = 0; y < this.h; y++) {
+            for (let x = 0; x < this.w; x++) {
+                this.tiles[y][x] = this.getNextDayTile(this.tiles[y][x]);
+            }
         }
     }
 
-    drawFromTileSet(
+    getNextDayTile(tile: Tile): Tile {
+        switch (tile) {
+            case Tile.Plant:
+                return Tile.DeadPlant;
+            case Tile.PlantTop:
+                return Tile.Empty;
+            case Tile.DeadPlant:
+                return Tile.Empty;
+            default:
+                return tile;
+        }
+    }
+
+    drawTile(
+        context: CanvasRenderingContext2D,
+        {
+            tilePos,
+            renderPos,
+        }: { tilePos: Point; renderPos: Point }
+    ) {
+        // Image must be loaded when this is called.
+        context.drawImage(
+            this.image!,
+            tilePos.x * TILE_SIZE_PX,
+            tilePos.y * TILE_SIZE_PX,
+            TILE_SIZE_PX,
+            TILE_SIZE_PX,
+            renderPos.x,
+            renderPos.y,
+            // +1 is a kludge to avoid gaps between tiles.
+            TILE_SIZE + 1,
+            TILE_SIZE + 1,
+        );
+    }
+
+    drawQuarterTile(
         context: CanvasRenderingContext2D,
         {
             tilePos,
@@ -116,16 +194,15 @@ export class Tiles {
             renderPos,
         }: { tilePos: Point; subTilePos: Point; renderPos: Point }
     ) {
+        // Image must be loaded when this is called.
         const halfTileSizePx = TILE_SIZE_PX / 2;
         const halfTileSize = TILE_SIZE / 2;
-        // Image must be loaded when this is called.
         context.drawImage(
             this.image!,
             tilePos.x * TILE_SIZE_PX + subTilePos.x * halfTileSizePx,
             tilePos.y * TILE_SIZE_PX + subTilePos.y * halfTileSizePx,
             halfTileSizePx,
             halfTileSizePx,
-            // TODO: I'm not sure about these being in the right coordinate space.
             renderPos.x + subTilePos.x * halfTileSize,
             renderPos.y + subTilePos.y * halfTileSize,
             // +1 is a kludge to avoid gaps between tiles.
@@ -135,17 +212,47 @@ export class Tiles {
     }
 
     setTile(p: Point, tile: Tile) {
-        this.tiles[p.y][p.x] = tile;
+        // If out of bounds, extend the board!
+        let y = p.y;
+        while (y + this.y < 1) {
+            this.tiles.unshift(this.tiles[0].slice())
+            this.y++;
+            this.h++;
+        }
+        while (y + this.y >= this.h - 1) {
+            this.tiles.push(this.tiles[this.h - 1].slice())
+            this.h++;
+        }
+
+        let x = p.x;
+        while (x + this.x < 1) {
+            for (let y = 0; y < this.h; y++) {
+                this.tiles[y].unshift(this.tiles[y][0]);
+            }
+            this.x++;
+            this.w++;
+        }
+        while (x + this.x >= this.w - 1) {
+            for (let y = 0; y < this.h; y++) {
+                this.tiles[y].push(this.tiles[y][this.w - 1]);
+            }
+            this.w++;
+        }
+
+        this.tiles[p.y + this.y][p.x + this.x] = tile;
+    }
+
+    setTileAtCoord(p: Point, tile: Tile) {
+        this.setTile({
+            x: Math.floor(p.x / TILE_SIZE),
+            y: Math.floor(p.y / TILE_SIZE),
+        }, tile);
     }
 
     getTile(p: Point): Tile {
-        if (p.x < 0 || p.x >= this.w || p.y >= this.h) {
-            return Tile.Wall;
-        }
-        if (p.y < 0) {
-            return Tile.Empty;
-        }
-        return this.tiles[p.y][p.x];
+        let x = Math.min(Math.max(p.x + this.x, 0), this.w - 1);
+        let y = Math.min(Math.max(p.y + this.y, 0), this.h - 1);
+        return this.tiles[y][x];
     }
 
     getTileAtCoord(p: Point): Tile {

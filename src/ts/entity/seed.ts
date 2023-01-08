@@ -1,5 +1,5 @@
 import { FacingDir } from "../common";
-import { FPS, physFromPx, PHYSICS_SCALE } from "../constants";
+import { FPS, physFromPx, PHYSICS_SCALE, TILE_SIZE } from "../constants";
 import { Level } from "../game/level";
 import { Tile } from "../game/tiles";
 import { Aseprite } from "../lib/aseprite";
@@ -12,15 +12,24 @@ const RIGHT_KEYS = ['d', 'ArrowRight'];
 const JUMP_KEYS = ['w', 'ArrowUp'];
 const PLANT_KEYS = ['s', 'ArrowDown'];
 
+export enum SeedType {
+    Vine = 'vine',
+    Dirt = 'dirt',
+    Bomb = 'bomb',
+}
+
 export class Seed extends Entity {
 
     runSpeed = 1.5 * PHYSICS_SCALE * FPS;
     jumpSpeed = 3 * PHYSICS_SCALE * FPS;
 
     planting = false;
+    planted = false;
     plantX = 0;
 
     controlledByPlayer = true;
+
+    type = SeedType.Vine;
 
     constructor(level: Level) {
         super(level);
@@ -35,7 +44,7 @@ export class Seed extends Entity {
         if (this.planting) {
             animName = 'plant';
             loop = false;
-        } else if (!this.isOnGround()) {
+        } else if (!this.isStanding()) {
             animName = 'jump';
             if (this.dy < -0.7 * this.jumpSpeed) {
                 animName += '-up-up';
@@ -56,6 +65,18 @@ export class Seed extends Entity {
             animName = 'run';
         }
 
+        let filter = '';
+        switch (this.type) {
+            case SeedType.Vine:
+                break;
+            case SeedType.Dirt:
+                filter = 'hue-rotate(90deg)';
+                break;
+            case SeedType.Bomb:
+                filter = 'hue-rotate(180deg)';
+                break;
+        }
+
         Aseprite.drawAnimation({
             context,
             image: 'seed',
@@ -64,6 +85,7 @@ export class Seed extends Entity {
             position: {x: this.midX, y: this.maxY},
             scale: PHYSICS_SCALE,
             anchorRatios: {x: 0.5, y: 1},
+            filter: filter,
             flippedX: this.facingDir == FacingDir.Left,
             loop,
         });
@@ -94,22 +116,19 @@ export class Seed extends Entity {
             this.midX = lerp(this.midX, this.plantX, updateAmt);
 
             if (this.animCount > Aseprite.images['seed'].animations['plant'].length / 1000) {
-                // Create a new player in the level.
+                this.planted = true;
+
                 if (this.controlledByPlayer) {
-                    this.level.spawnPlayer();
-                    this.controlledByPlayer = false;
+                    this.level.endDay();
                 }
             }
             return;
         }
 
-        const onGround = this.isOnGround();
-        if (onGround) {
-            if (keys.anyWasPressedThisFrame(JUMP_KEYS)) {
-                this.jump();
-            } else if (keys.anyWasPressedThisFrame(PLANT_KEYS)) {
-                this.plant();
-            }
+        if (this.isStanding() && keys.anyWasPressedThisFrame(JUMP_KEYS)) {
+            this.jump();
+        } else if (this.isOnGround() && keys.anyWasPressedThisFrame(PLANT_KEYS)) {
+            this.plant();
         }
 
         const left = keys.anyIsPressed(LEFT_KEYS);
@@ -127,6 +146,54 @@ export class Seed extends Entity {
         this.applyGravity(dt);
         this.moveX(dt);
         this.moveY(dt);
+    }
+
+    grow() {
+        if (this.done) {
+            return;
+        }
+        this.done = true;
+
+        switch (this.type) {
+            case SeedType.Vine:
+                this.growVine();
+                break;
+            case SeedType.Dirt:
+                this.growDirt();
+                break;
+            case SeedType.Bomb:
+                this.explode();
+                break;
+        }
+    }
+
+    growVine() {
+        // Check if we have enough space.
+        const pos = {x: this.midX, y: this.maxY};
+        const above = {x: this.midX, y: this.maxY - TILE_SIZE};
+        if (this.level.tiles.getTileAtCoord(above) == Tile.Wall) {
+            this.level.tiles.setTileAtCoord(pos, Tile.DeadPlant);
+            return;
+        }
+
+        this.level.tiles.setTileAtCoord(pos, Tile.Plant);
+        this.level.tiles.setTileAtCoord(above, Tile.PlantTop);
+    }
+
+    growDirt() {
+        this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.Wall);
+    }
+
+    explode() {
+        for (const dx of [-1, 0, 1]) {
+            for (const dy of [-1, 0, 1]) {
+                const p = {
+                    x: this.midX + dx * TILE_SIZE,
+                    y: this.maxY + dy * TILE_SIZE
+                };
+                this.level.tiles.setTileAtCoord(p, Tile.Empty);
+            }
+        }
     }
 
     plant() {
