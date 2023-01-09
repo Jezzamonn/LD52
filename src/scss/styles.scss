@@ -5,10 +5,15 @@ html, body {
     overflow: hidden;
 
     background-color: black;
+    color: white;
 }
 
 body {
     --scale: 1;
+}
+
+h2 {
+    margin-bottom: 0;
 }
 
 .hidden {
@@ -29,6 +34,14 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+}
+
+
+.seed-picker-text {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
@@ -83,14 +96,14 @@ body {
 
     margin-top: 20px;
 
+    pointer-events: none;
+
     font-size: 2vw;
     max-width: 30vw;
 }
 
 .seed-button-contents {
     position: absolute;
-
-    pointer-events: none;
 
     display: flex;
     flex-direction: column;

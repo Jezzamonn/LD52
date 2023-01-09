@@ -24,6 +24,7 @@ export class SeedPicker {
 
     async setSeedTypes(seedTypes: (SeedType|string)[]) {
         this.clearButtons();
+
         for (const type of seedTypes) {
             const btn = await this.createButton(type);
             this.seedsElem.appendChild(btn);
@@ -65,6 +66,14 @@ export class SeedPicker {
     async show(seedTypes: (SeedType|string)[], delay: number = 0) {
         await this.setSeedTypes(seedTypes);
 
+        if (seedTypes.some(t => t === 'next')) {
+            this.showWinText();
+        } else if (seedTypes.some(t => typeof t != 'string')) {
+            this.showDefaultText();
+        } else {
+            this.hideText();
+        }
+
         this.elem.classList.remove('seed-picker__closed');
         this.shown = true;
 
@@ -72,6 +81,24 @@ export class SeedPicker {
         this.updateFocus();
 
         Sounds.setVolume(0.5);
+    }
+
+    hideText() {
+        document.querySelector('.seed-picker-text')!.classList.add('hidden');
+    }
+
+    showWinText() {
+        document.querySelector('.seed-picker-text')!.classList.remove('hidden');
+
+        (document.querySelector('.seed-picker-title') as HTMLElement)!.innerText = 'You Win!';
+        (document.querySelector('.seed-picker-subtitle') as HTMLElement)!.innerText = '';
+    }
+
+    showDefaultText() {
+        document.querySelector('.seed-picker-text')!.classList.remove('hidden');
+
+        (document.querySelector('.seed-picker-title') as HTMLElement)!.innerText = 'Choose a seed!';
+        (document.querySelector('.seed-picker-subtitle') as HTMLElement)!.innerText = 'Use the arrow keys to select and space to confirm';
     }
 
     hide() {
