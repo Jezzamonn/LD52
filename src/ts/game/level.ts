@@ -1,5 +1,5 @@
 import { Point } from "../common";
-import { rng } from "../constants";
+import { rng, TILE_SIZE, TILE_SIZE_PX } from "../constants";
 import { Entity } from "./entity/entity";
 import { Seed, SeedType } from "./entity/seed";
 import { Sprite } from "./entity/sprite";
@@ -19,7 +19,7 @@ export class Level {
     remainingSeeds: SeedType[] = [];
 
     camera: FocusCamera = new FocusCamera();
-    background: Background = new Background(this);
+    background: Background;
 
     tiles: Tiles = new Tiles(0, 0);
 
@@ -37,6 +37,11 @@ export class Level {
         this.image = image;
         this.entities = [];
         this.tiles = new Tiles(image.width, image.height);
+
+        this.background = new Background(this, {
+            x: TILE_SIZE_PX * image.width / 2,
+            y: TILE_SIZE_PX * image.height / 2,
+        });
 
         // Draw the image to a canvas to get the pixels.
         const canvas = document.createElement('canvas');

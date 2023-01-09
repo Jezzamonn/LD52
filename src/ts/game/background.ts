@@ -18,7 +18,7 @@ const BG_LAYERS: LayerInfo[] = [
         offset: {
             x: 0,
             y: -20,
-        }
+        },
     },
     {
         image: "bg-clouds-far",
@@ -30,24 +30,38 @@ const BG_LAYERS: LayerInfo[] = [
     },
     {
         image: "bg-ground-far",
-        scale: 0.3,
+        scale: 0.2,
+        offset: {
+            x: 0,
+            y: 20,
+        },
     },
     {
         image: "bg-ground-mid",
-        scale: 0.5,
+        scale: 0.3,
+        offset: {
+            x: 0,
+            y: 20,
+        },
     },
     {
         image: "bg-ground-close",
-        scale: 0.7,
+        scale: 0.4,
+        offset: {
+            x: 0,
+            y: 20,
+        },
     },
 ];
 export class Background {
     level: Level;
 
     layers: BackgroundLayer[] = [];
+    offset: Point;
 
-    constructor(level: Level) {
+    constructor(level: Level, offset: Point) {
         this.level = level;
+        this.offset = offset;
 
         for (const layer of BG_LAYERS) {
             this.layers.push(
@@ -118,15 +132,15 @@ class BackgroundLayer {
         context.save();
         context.resetTransform();
 
-        // centerCanvas(context);
+        centerCanvas(context);
 
         this.background.level.game.applyScale(context);
         this.background.level.camera.applyTransform(context, this.scale);
 
         const image = Images.images[this.image].image!;
         context.drawImage(image,
-            physFromPx(this.offset.x),
-            physFromPx(this.offset.y),
+            physFromPx(this.offset.x - image.width / 2 + this.scale * this.background.offset.x),
+            physFromPx(this.offset.y - image.height / 2 + this.scale * this.background.offset.y),
             physFromPx(image.width),
             physFromPx(image.height),
         );
