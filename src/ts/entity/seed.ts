@@ -41,6 +41,19 @@ export class Seeds {
     static randomSeed(): SeedType {
         return Math.floor(Math.random() * 4);
     }
+
+    static getDescription(s: SeedType) {
+        switch (s) {
+            case SeedType.Vine:
+                return 'Vine Seed. Grows a vine you can stand on';
+            case SeedType.Dirt:
+                return 'Dirt Seed. Grows some dirt.';
+            case SeedType.Bomb:
+                return 'Bomb Seed. Explodes a hole in the ground when it grows';
+            case SeedType.Flower:
+                return 'Teeny Seed. Grows a precious flower, winning the level. Very fragile, must be planted in glowing soil.';
+        }
+    }
 }
 
 export class Seed extends Entity {
@@ -266,6 +279,13 @@ export class Seed extends Entity {
                 this.level.tiles.setTileAtCoord(p, Tile.Empty);
             }
         }
+        // Explode animation
+        // TODO: Explode SFX
+        const explodeSprite = new Sprite(this.level, 'explosion', {oneLoop: true, anchorRatios: {x: 0.5, y: 0.5}});
+        const explodePos = this.level.tiles.getTileCoordFromCoord({x: this.midX, y: this.maxY}, {x: 0.5, y: 0.5});
+        explodeSprite.midX = explodePos.x;
+        explodeSprite.midY = explodePos.y;
+        this.level.entities.push(explodeSprite);
     }
 
     plant() {

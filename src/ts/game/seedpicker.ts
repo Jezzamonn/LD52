@@ -91,18 +91,14 @@ export class SeedPicker {
         const btn = document.createElement('div');
         btn.classList.add('seed-button');
 
-        let image: HTMLElement;
-        if (typeof type === 'string') {
-            // We only have a retry button at the moment
-            image = this.createSpriteImage(type);
-        }
-        else {
-            image = await this.createSeedImage(type);
-        }
+        const image = await this.createImageElement(type);
+        const desc = this.createDescriptionElem(type);
 
-        image.classList.add('seed-button-image');
+        const btnContents = document.createElement('div');
+        btnContents.classList.add('seed-button-contents');
 
-        btn.appendChild(image);
+        btnContents.append(image, desc);
+        btn.append(btnContents);
 
         btn.addEventListener('click', () => {
             this.onChoice(type);
@@ -117,6 +113,37 @@ export class SeedPicker {
             this.updateFocus();
         });
         return btn;
+    }
+
+    createDescriptionElem(type: SeedType | string): HTMLElement {
+        const descriptionElem = document.createElement('p');
+        descriptionElem.classList.add('seed-button-description');
+
+        const description = this.getDescription(type);
+        descriptionElem.innerText = description;
+
+        return descriptionElem;
+    }
+
+    getDescription(type: SeedType | string): string {
+        if (typeof type === 'string') {
+            return type[0].toUpperCase() + type.slice(1);
+        }
+        return Seeds.getDescription(type);
+    }
+
+    async createImageElement(type: SeedType | string): Promise<HTMLElement> {
+        let image: HTMLElement;
+        if (typeof type === 'string') {
+            // We only have a retry button at the moment
+            image = this.createSpriteImage(type);
+        }
+        else {
+            image = await this.createSeedImage(type);
+        }
+
+        image.classList.add('seed-button-image');
+        return image;
     }
 
     createSpriteImage(type: string): HTMLElement {

@@ -544,10 +544,12 @@ export function getFrame(
         return -1;
     }
     const animData = image.animations[animationName];
-    if (!loop) {
-        time = Math.min(time, animData.length / 1000 - 1);
+    let localTimeMs = 1000 * time;
+    if (loop) {
+        localTimeMs %= animData.length;
+    } else {
+        localTimeMs = Math.min(localTimeMs, animData.length - 1);
     }
-    const localTimeMs = (1000 * time) % animData.length;
     let cumulativeTimeMs = 0;
     for (let i = animData.from; i <= animData.to; i++) {
         cumulativeTimeMs += image.frames[i].duration;
