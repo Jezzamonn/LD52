@@ -6,6 +6,8 @@
 node_modules
 profiles/
 
+*.ttf
+
 /music/
 !music/*.mp3
 

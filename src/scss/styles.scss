@@ -1,5 +1,10 @@
+@font-face {
+    font-family: 'Babyblocks';
+    src: url('../font/ChevyRay - Babyblocks.ttf') format('truetype');
+}
+
 html, body {
-    font-family: sans-serif;
+    font-family: 'Babyblocks', sans-serif;
 
     margin: 0;
     overflow: hidden;
