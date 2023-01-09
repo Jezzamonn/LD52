@@ -81,6 +81,9 @@ export class SeedPicker {
         this.updateFocus();
 
         Sounds.setVolume(0.5);
+
+        const textElem = document.querySelector('.level-text-container')!;
+        textElem.classList.add('hidden');
     }
 
     hideText() {
@@ -105,6 +108,9 @@ export class SeedPicker {
         this.elem.classList.add('seed-picker__closed');
         this.shown = false;
         Sounds.setVolume(1);
+
+        const textElem = document.querySelector('.level-text-container')!;
+        textElem.classList.remove('hidden');
     }
 
     clearButtons() {

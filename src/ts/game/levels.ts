@@ -6,6 +6,7 @@ export interface LevelInfo {
     name: string;
     seeds: SeedType[];
     song?: string;
+    text?: string;
 }
 
 
@@ -16,6 +17,7 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Flower,
         ],
         song: 'farmin-chords',
+        text: 'There once was a teeny seed who wanted to grow into a beautiful flower.<br><br>Use the arrow keys to move and press down to plant yourself!'
     },
     {
         name: 'use-vine',

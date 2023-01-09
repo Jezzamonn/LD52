@@ -21,10 +21,6 @@ h2 {
     margin-bottom: 0;
 }
 
-.hidden {
-    display: none;
-}
-
 .seed-picker {
     position: absolute;
     top: 0;
@@ -183,4 +179,28 @@ h2 {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+}
+
+.level-text-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.level-text {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    border-radius: 3px;
+    font-size: 32px;
+}
+
+.hidden {
+    display: none;
 }

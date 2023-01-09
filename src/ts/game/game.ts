@@ -109,6 +109,15 @@ export class Game {
         if (levelInfo.song) {
             Sounds.setSong(levelInfo.song);
         }
+
+        const textElem = document.querySelector('.level-text')!;
+        if (levelInfo.text) {
+            textElem.innerHTML = levelInfo.text;
+            textElem.classList.remove('hidden');
+        }
+        else {
+            textElem.classList.add('hidden');
+        }
     }
 
     async endDay(extraDelay: number = 0) {
