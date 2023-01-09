@@ -11,7 +11,7 @@ export class SeedPicker {
     seedsElem: HTMLElement;
     shown = false;
 
-    buttons: HTMLDivElement[] = [];
+    buttons: HTMLElement[] = [];
     focusedIndex = 0;
 
     onChoice: (type: SeedType | string) => void = () => {};
@@ -34,6 +34,8 @@ export class SeedPicker {
     updateFocus() {
         for (const [i, btn] of this.buttons.entries()) {
             btn.classList.toggle('seed-button__focused', i === this.focusedIndex);
+            const dist = Math.abs(i - this.focusedIndex);
+            btn.style.zIndex = (this.buttons.length - dist).toString();
         }
     }
 
@@ -106,6 +108,14 @@ export class SeedPicker {
             this.onChoice(type);
         });
 
+        btn.addEventListener('mouseenter', () => {
+            this.focusedIndex = this.buttons.indexOf(btn);
+            this.updateFocus();
+        });
+        btn.addEventListener('focus', () => {
+            this.focusedIndex = this.buttons.indexOf(btn);
+            this.updateFocus();
+        });
         return btn;
     }
 

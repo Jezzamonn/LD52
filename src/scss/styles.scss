@@ -31,6 +31,8 @@ html, body {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
 .seed-picker__closed {
@@ -38,25 +40,38 @@ html, body {
 }
 
 .seed-button {
+
     flex: 1;
     text-decoration: none;
     border: none;
     background: none;
+    background-color: transparent;
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     max-width: 50vw;
     max-height: 50vh;
 
-    // This is working!
-    transition: transform 0.1s ease;
-
     &:hover, &:focus, &.seed-button__focused {
-        transform: scale(1.1);
+        .seed-button-image {
+            transform: scale(1.1);
+        }
     }
 }
 
 .seed-button-image {
-    width: 100%;
+    pointer-events: none;
+
+    position: absolute;
+    width: 30vw;
+    height: 30vw;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+
+    transition: transform 0.1s ease;
 }
