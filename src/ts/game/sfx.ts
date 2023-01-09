@@ -183,7 +183,7 @@ const sfx = {
         p_env_sustain: 0.2280823275059672,
         p_env_punch: 0,
         p_env_decay: 0.34279008988393245,
-        p_base_freq: 0.299,
+        p_base_freq: 0.4,
         p_freq_limit: 0,
         p_freq_ramp: 0.19171862067828294,
         p_freq_dramp: 0,

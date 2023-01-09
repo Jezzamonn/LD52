@@ -187,7 +187,7 @@ export class Seed extends Entity {
             return;
         }
 
-        if (/*this.isStanding() && */keys.anyWasPressedThisFrame(JUMP_KEYS)) {
+        if (keys.anyWasPressedThisFrame(JUMP_KEYS)) {
             this.jump();
         } else if (this.isOnGround() && keys.anyWasPressedThisFrame(PLANT_KEYS)) {
             this.plant();
