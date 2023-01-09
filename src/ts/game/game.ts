@@ -112,7 +112,9 @@ export class Game {
             this.seedPicker.show(['retry']);
         }
         else {
-            this.seedPicker.show(this.curLevel!.remainingSeeds);
+            const options: (SeedType | string)[] = this.curLevel!.remainingSeeds.slice();
+            options.push('retry');
+            this.seedPicker.show(options);
         }
     }
 

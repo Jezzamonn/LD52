@@ -161,6 +161,14 @@ export class Seed extends Entity {
             if (prevFrame != frame && (frame == startFrame + 1 || frame == startFrame + 3)) {
                 SFX.play('walk');
             }
+        } else if (animName == 'plant') {
+            const startFrame = Aseprite.getFrame('seed', 'plant', 0)
+
+            const prevFrame = Aseprite.getFrame('seed', 'plant', prevAnimCount);
+            const frame = Aseprite.getFrame('seed', 'plant', this.animCount);
+            if (prevFrame != frame && (frame == startFrame + 3)) {
+                SFX.play('bury');
+            }
         }
 
         let keys = this.controlledByPlayer ? this.level.game.keysForEntity : new NullKeys();
