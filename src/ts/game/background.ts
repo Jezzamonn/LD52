@@ -148,7 +148,7 @@ class BackgroundLayer {
         const isCloud = this.image.startsWith("bg-clouds");
         let windOffset = 0;
         if (isCloud) {
-            windOffset = 10 * this.scale * this.animCount;
+            windOffset = 30 * this.scale * this.animCount;
         }
 
         const image = Images.images[this.image].image!;

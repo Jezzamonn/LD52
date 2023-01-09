@@ -25,7 +25,7 @@
       "patterns": [
         "sprites/**"
       ],
-      "extensions": "json,png"
+      "extensions": "json,png,gif"
     },
     "music": {
       "patterns": [

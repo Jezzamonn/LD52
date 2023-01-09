@@ -24,6 +24,7 @@ export class Game {
     simulatedTimeMs: number | undefined;
 
     levelIndex = 0;
+    showingTitle = true;
     curLevel: Level | undefined;
     seedPicker: SeedPicker;
 
@@ -63,7 +64,11 @@ export class Game {
 
         this.doAnimationLoop();
 
-        this.startLevel(this.levelIndex);
+        // Show the title (already shown in the initial HTML)
+        // Play title music
+        Sounds.setSong('farmin-chords');
+
+        // this.startLevel(this.levelIndex);
     }
 
     onChoice(type: SeedType | string) {
@@ -167,19 +172,32 @@ export class Game {
     }
 
     handleInput() {
+        if (this.keys.wasPressedThisFrame('KeyM')) {
+            // Mute
+            Sounds.toggleMute();
+        }
+        if (this.showingTitle) {
+            if (this.keys.anyWasPressedThisFrame(SELECT_KEYS)) {
+                this.hideTitle();
+                this.showingTitle = false;
+                this.startLevel(this.levelIndex);
+            }
+            return;
+        }
         if (this.keys.wasPressedThisFrame('Comma')) {
             this.prevLevel();
         }
         if (this.keys.wasPressedThisFrame('Period')) {
             this.nextLevel();
         }
-        if (this.keys.wasPressedThisFrame('KeyM')) {
-            // Mute
-            Sounds.toggleMute();
-        }
         if (this.keys.wasPressedThisFrame('KeyR')) {
             this.startLevel(this.levelIndex);
         }
+    }
+
+    hideTitle() {
+        const titleElem = document.querySelector('.title-container')!;
+        titleElem.classList.add('hidden');
     }
 
     update(dt: number) {
