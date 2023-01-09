@@ -179,7 +179,7 @@ export class Seed extends Entity {
 
             if (this.animCount > Aseprite.images['seed'].animations['plant'].length / 1000) {
                 if (!this.planted && this.controlledByPlayer) {
-                    this.level.endDay();
+                    this.level.game.endDay(this.type == SeedType.Bomb ? 0.5 : 0);
                 }
                 this.planted = true;
 

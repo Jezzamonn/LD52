@@ -103,10 +103,6 @@ export class Level {
         }
     }
 
-    endDay() {
-        this.game.endDay();
-    }
-
     spawnPlayer(seedType: SeedType) {
         const seed = new Seed(this);
         seed.midX = this.start.x;

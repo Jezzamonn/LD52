@@ -111,11 +111,11 @@ export class Game {
         }
     }
 
-    async endDay() {
+    async endDay(extraDelay: number = 0) {
         // Show our animation! :D
         this.playDayTransition();
         SFX.play('sweep');
-        await wait(0.8);
+        await wait(0.3 + extraDelay);
         this.curLevel!.advanceDay();
         await wait(1.3);
 
