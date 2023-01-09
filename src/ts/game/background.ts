@@ -23,10 +23,18 @@ const BG_LAYERS: LayerInfo[] = [
     {
         image: "bg-clouds-far",
         scale: 0.05,
+        offset: {
+            x: -20,
+            y: 0,
+        },
     },
     {
         image: "bg-clouds-close",
         scale: 0.1,
+        offset: {
+            x: -20,
+            y: 0,
+        },
     },
     {
         image: "bg-ground-far",
@@ -137,9 +145,15 @@ class BackgroundLayer {
         this.background.level.game.applyScale(context);
         this.background.level.camera.applyTransform(context, this.scale);
 
+        const isCloud = this.image.startsWith("bg-clouds");
+        let windOffset = 0;
+        if (isCloud) {
+            windOffset = 10 * this.scale * this.animCount;
+        }
+
         const image = Images.images[this.image].image!;
         context.drawImage(image,
-            physFromPx(this.offset.x - image.width / 2 + this.scale * this.background.offset.x),
+            physFromPx(this.offset.x - image.width / 2 + this.scale * this.background.offset.x + windOffset),
             physFromPx(this.offset.y - image.height / 2 + this.scale * this.background.offset.y),
             physFromPx(image.width),
             physFromPx(image.height),
