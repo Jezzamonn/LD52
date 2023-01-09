@@ -59,10 +59,10 @@ export class Level {
                 }
                 else if (color === 'ffff00') {
                     this.tiles.setTile({ x, y }, Tile.Glow);
-                    const glow = new Sprite(this, 'glow');
-                    glow.midX = basePos.x;
-                    glow.maxY = basePos.y;
-                    this.entities.push(glow);
+                    // const glow = new Sprite(this, 'glow');
+                    // glow.midX = basePos.x;
+                    // glow.maxY = basePos.y;
+                    // this.entities.push(glow);
                 }
                 else if (color === 'ff0000') {
                     this.start = basePos;
@@ -122,6 +122,7 @@ export class Level {
             }
         }
 
+        this.tiles.update(dt);
         this.camera.update(dt);
     }
 

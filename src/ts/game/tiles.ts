@@ -147,24 +147,18 @@ export class Tiles {
                 }
             );
         } else if (tile == Tile.Glow) {
-            // Aseprite.drawAnimation({
-            //     context,
-            //     image: 'glow',
-            //     animationName: 'idle',
-            //     time: this.animCount,
-            //     position: {
-            //         x: renderPos.x,// + TILE_SIZE / 2,
-            //         y: renderPos.y,// + TILE_SIZE,
-            //     },
-            //     anchorRatios: { x: 0.5, y: 1 },
-            // })
-            // this.drawTile(
-            //     context,
-            //     {
-            //         tilePos: { x: Math.floor(2 * rng()), y: Math.floor(4 * rng()) },
-            //         renderPos,
-            //     }
-            // );
+            Aseprite.drawAnimation({
+                context,
+                image: 'glow',
+                animationName: 'idle',
+                time: this.animCount,
+                position: {
+                    x: renderPos.x + TILE_SIZE / 2,
+                    y: renderPos.y + TILE_SIZE,
+                },
+                scale: PHYSICS_SCALE,
+                anchorRatios: { x: 0.5, y: 1 },
+            })
         }
         // TODO maybe: little grass spikes? idk
     }
