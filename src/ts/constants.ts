@@ -15,6 +15,13 @@ export const GAME_HEIGHT = GAME_HEIGHT_PX * PHYSICS_SCALE;
 export const TILE_SIZE_PX = 16;
 export const TILE_SIZE = TILE_SIZE_PX * PHYSICS_SCALE;
 
+export const LEFT_KEYS = ['a', 'ArrowLeft'];
+export const RIGHT_KEYS = ['d', 'ArrowRight'];
+export const JUMP_KEYS = ['w', 'ArrowUp'];
+export const DOWN_KEYS = ['s', 'ArrowDown'];
+export const PLANT_KEYS = ['s', 'ArrowDown'];
+export const SELECT_KEYS = ['Space', 'Enter'];
+
 export function physFromPx(x: number): number {
     return x * PHYSICS_SCALE;
 }

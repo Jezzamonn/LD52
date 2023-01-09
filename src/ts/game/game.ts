@@ -1,4 +1,4 @@
-import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, TIME_STEP } from "../constants";
+import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, SELECT_KEYS, TIME_STEP } from "../constants";
 import { Seed, SeedType } from "../entity/seed";
 import { Sprite } from "../entity/sprite";
 import { Aseprite } from "../lib/aseprite";
@@ -46,7 +46,7 @@ export class Game {
         this.context = context;
 
         this.keys = new KeyboardKeys();
-        this.seedPicker = new SeedPicker();
+        this.seedPicker = new SeedPicker(this);
 
         Sounds.loadMuteState();
     }
@@ -92,8 +92,7 @@ export class Game {
         level.initFromImage();
         this.curLevel = level;
 
-        this.seedPicker.setSeedTypes(level.remainingSeeds);
-        this.seedPicker.show();
+        this.seedPicker.show(level.remainingSeeds);
         this.seedPicker.onChoice = (choice) => this.onChoice(choice);
 
         if (levelInfo.song) {
@@ -103,16 +102,13 @@ export class Game {
 
     showPicker() {
         if (this.curLevel!.won) {
-            this.seedPicker.setSeedTypes(['next']);
-            this.seedPicker.show();
+            this.seedPicker.show(['next']);
         }
         else if (this.curLevel!.remainingSeeds.length == 0) {
-            this.seedPicker.setSeedTypes(['retry']);
-            this.seedPicker.show();
+            this.seedPicker.show(['retry']);
         }
         else {
-            this.seedPicker.setSeedTypes(this.curLevel!.remainingSeeds);
-            this.seedPicker.show();
+            this.seedPicker.show(this.curLevel!.remainingSeeds);
         }
     }
 
@@ -141,7 +137,7 @@ export class Game {
     }
 
     debugInput() {
-        if (this.curLevel!.won && this.keys.anyWasPressedThisFrame(['Space', 'Enter'])) {
+        if (this.curLevel!.won && this.keys.anyWasPressedThisFrame(SELECT_KEYS)) {
             this.nextLevel();
         }
         if (this.keys.wasPressedThisFrame('Period')) {
@@ -159,6 +155,8 @@ export class Game {
     update(dt: number) {
         try {
             this.debugInput();
+
+            this.seedPicker.update(dt);
 
             this.curLevel?.update(dt);
 

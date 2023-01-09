@@ -46,10 +46,10 @@ html, body {
     max-width: 50vw;
     max-height: 50vh;
 
-    // This isn't working :(
-    // transition: transform 1s ease;
+    // This is working!
+    transition: transform 0.1s ease;
 
-    :hover, :focus {
+    &:hover, &:focus, &.seed-button__focused {
         transform: scale(1.1);
     }
 }

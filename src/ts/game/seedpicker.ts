@@ -1,16 +1,23 @@
 import { Seeds, SeedType } from "../entity/seed";
 import { Aseprite, images } from "../lib/aseprite";
 import { Sounds } from "../lib/sounds";
+import { Game } from "./game";
+import { LEFT_KEYS, RIGHT_KEYS, SELECT_KEYS } from "../constants";
 
 export class SeedPicker {
+    game: Game;
 
     elem: HTMLElement;
     seedsElem: HTMLElement;
     shown = false;
 
+    buttons: HTMLDivElement[] = [];
+    focusedIndex = 0;
+
     onChoice: (type: SeedType | string) => void = () => {};
 
-    constructor() {
+    constructor(game: Game) {
+        this.game = game;
         this.elem = document.querySelector('.seed-picker')!;
         this.seedsElem = document.querySelector('.seeds')!;
     }
@@ -20,12 +27,48 @@ export class SeedPicker {
         for (const type of seedTypes) {
             const btn = await this.createButton(type);
             this.seedsElem.appendChild(btn);
+            this.buttons.push(btn);
         }
     }
 
-    show() {
+    updateFocus() {
+        for (const [i, btn] of this.buttons.entries()) {
+            btn.classList.toggle('seed-button__focused', i === this.focusedIndex);
+        }
+    }
+
+    update(dt: number) {
+        this.handleKeys();
+    }
+
+    handleKeys() {
+        if (!this.shown) {
+            return;
+        }
+
+        const keys = this.game.keys;
+        if (keys.anyWasPressedThisFrame(LEFT_KEYS)) {
+            this.focusedIndex = Math.max(0, this.focusedIndex - 1);
+            this.updateFocus();
+        }
+        else if (keys.anyWasPressedThisFrame(RIGHT_KEYS)) {
+            this.focusedIndex = Math.min(this.buttons.length - 1, this.focusedIndex + 1);
+            this.updateFocus();
+        }
+        else if (keys.anyWasPressedThisFrame(SELECT_KEYS)) {
+            this.buttons[this.focusedIndex].click();
+        }
+    }
+
+    async show(seedTypes: (SeedType|string)[]) {
+        await this.setSeedTypes(seedTypes);
+
         this.elem.classList.remove('seed-picker__closed');
         this.shown = true;
+
+        this.focusedIndex = 0;
+        this.updateFocus();
+
         Sounds.setVolume(0.5);
     }
 
@@ -39,10 +82,11 @@ export class SeedPicker {
         while (this.seedsElem.firstChild) {
             this.seedsElem.removeChild(this.seedsElem.lastChild!);
         }
+        this.buttons = [];
     }
 
     async createButton(type: SeedType | string) {
-        const btn = document.createElement('button');
+        const btn = document.createElement('div');
         btn.classList.add('seed-button');
 
         let image: HTMLElement;

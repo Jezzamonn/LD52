@@ -1,5 +1,5 @@
 import { FacingDir } from "../common";
-import { FPS, physFromPx, PHYSICS_SCALE, rng, TILE_SIZE } from "../constants";
+import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, PLANT_KEYS, RIGHT_KEYS, rng, TILE_SIZE } from "../constants";
 import { Level } from "../game/level";
 import { SFX } from "../game/sfx";
 import { Tile } from "../game/tiles";
@@ -9,11 +9,6 @@ import { Sounds } from "../lib/sounds";
 import { lerp } from "../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
-
-const LEFT_KEYS = ['a', 'ArrowLeft'];
-const RIGHT_KEYS = ['d', 'ArrowRight'];
-const JUMP_KEYS = ['w', 'ArrowUp'];
-const PLANT_KEYS = ['s', 'ArrowDown'];
 
 export enum SeedType {
     Vine,
