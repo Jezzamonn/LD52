@@ -1,4 +1,4 @@
-import { FacingDir } from "../common";
+import { FacingDir, Point } from "../common";
 import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, PLANT_KEYS, RIGHT_KEYS, rng, TILE_SIZE } from "../constants";
 import { Level } from "../game/level";
 import { SFX } from "../game/sfx";
@@ -111,6 +111,12 @@ export class Seed extends Entity {
             flippedX: this.facingDir == FacingDir.Left,
             loop,
         });
+    }
+
+    cameraFocus(): Point {
+        const facingMult = this.facingDir == FacingDir.Right ? 1 : -1;
+        const mult = this.planting ? 0 : facingMult;
+        return { x: this.midX + mult * physFromPx(30), y: this.maxY };
     }
 
     jump() {

@@ -108,7 +108,7 @@ export class Level {
         // Remove this seed as an option.
         this.remainingSeeds.splice(this.remainingSeeds.indexOf(seedType), 1);
 
-        this.camera.target = () => ({x: seed.midX, y: seed.minY});
+        this.camera.target = () => seed.cameraFocus();
     }
 
     update(dt: number) {

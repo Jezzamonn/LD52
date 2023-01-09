@@ -13,77 +13,73 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'flower',
         seeds: [
-            SeedType.Flower],
+            SeedType.Flower,
+        ],
         song: 'farmin-chords',
     },
     {
         name: 'use-vine',
         seeds: [
+            SeedType.Vine,
             SeedType.Flower,
-            SeedType.Vine],
+        ],
     },
     {
         name: 'vine-misdirection',
         seeds: [
-            SeedType.Flower,
             SeedType.Vine,
+            SeedType.Flower,
         ],
         song: 'farmin-default',
     },
     {
         name: 'explode',
         seeds: [
-            SeedType.Flower,
             SeedType.Vine,
             SeedType.Bomb,
+            SeedType.Flower,
         ],
     },
     {
         name: 'explode-and-grow',
         seeds: [
-            SeedType.Flower,
             SeedType.Vine,
             SeedType.Bomb,
+            SeedType.Flower,
         ],
     },
     {
         name: 'dirt',
         seeds: [
-            SeedType.Flower,
             SeedType.Vine,
             SeedType.Vine,
             SeedType.Bomb,
             SeedType.Dirt,
+            SeedType.Flower,
         ],
     },
     {
         name: 'tunnel',
         seeds: [
-            SeedType.Flower,
             SeedType.Vine,
             SeedType.Bomb,
             SeedType.Dirt,
+            SeedType.Flower,
         ],
     },
     {
         name: 'bomb-maze',
         seeds: [
+            SeedType.Bomb,
+            SeedType.Bomb,
+            SeedType.Bomb,
+            SeedType.Bomb,
             SeedType.Flower,
-            SeedType.Bomb,
-            SeedType.Bomb,
-            SeedType.Bomb,
-            SeedType.Bomb,
         ],
     },
     {
         name: 'win',
         seeds: [
-            SeedType.Flower,
-            SeedType.Flower,
-            SeedType.Flower,
-            SeedType.Flower,
-            SeedType.Flower,
-            SeedType.Flower,
             SeedType.Vine,
             SeedType.Vine,
             SeedType.Vine,
@@ -96,6 +92,8 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Dirt,
             SeedType.Dirt,
             SeedType.Dirt,
+            SeedType.Flower,
+            SeedType.Flower,
         ],
         song: 'farmin-alt-chords',
     },
