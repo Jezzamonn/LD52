@@ -63,7 +63,7 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Dirt,
             SeedType.Flower,
         ],
-        text: `In the corner of the field, they found a dirty-looking seed. He looked sad. "Nobody's wanted to be friends with me before."<br><br>"You can be friends with us!" said the Teeny Seed.`,
+        text: `In the corner of the field, they found a dirty-looking seed. He looked sad. "Nobody wants to be friends with me."<br><br>"You can be friends with us!" said the Teeny Seed.`,
     },
     {
         name: 'tunnel',
@@ -105,7 +105,7 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Flower,
         ],
         song: 'farmin-alt-chords',
-        text: `They finally made to the end of the game. Congratulations!`,
+        text: `They finally made it to the end of the game. Congratulations!`,
     },
 ]
 

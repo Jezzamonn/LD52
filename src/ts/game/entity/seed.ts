@@ -45,11 +45,11 @@ export class Seeds {
     static getDescription(s: SeedType) {
         switch (s) {
             case SeedType.Vine:
-                return 'Vine Seed. Grows a vine you can stand on';
+                return 'Vine Seed. Grows a vine you can stand on.';
             case SeedType.Dirt:
                 return 'Dirt Seed. Grows some dirt.';
             case SeedType.Bomb:
-                return 'Cherry Bomb Seed. Explodes a hole in the ground when it grows';
+                return 'Cherry Bomb Seed. Explodes a hole in the ground when it grows.';
             case SeedType.Flower:
                 return 'Teeny Seed. Grows a precious flower, winning the level. Very fragile, must be planted in glowing soil.';
         }
