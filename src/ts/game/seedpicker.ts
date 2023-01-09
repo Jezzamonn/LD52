@@ -1,4 +1,4 @@
-import { Seeds, SeedType } from "../entity/seed";
+import { Seeds, SeedType } from "./entity/seed";
 import { Aseprite, images } from "../lib/aseprite";
 import { Sounds } from "../lib/sounds";
 import { Game } from "./game";

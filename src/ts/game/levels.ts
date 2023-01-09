@@ -1,4 +1,4 @@
-import { SeedType } from "../entity/seed";
+import { SeedType } from "./entity/seed";
 import { Images } from "../lib/images";
 import { Sounds } from "../lib/sounds";
 

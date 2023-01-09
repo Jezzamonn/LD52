@@ -1,8 +1,8 @@
 import { Point } from "../common";
 import { rng } from "../constants";
-import { Entity } from "../entity/entity";
-import { Seed, SeedType } from "../entity/seed";
-import { Sprite } from "../entity/sprite";
+import { Entity } from "./entity/entity";
+import { Seed, SeedType } from "./entity/seed";
+import { Sprite } from "./entity/sprite";
 import { Images } from "../lib/images";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";

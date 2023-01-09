@@ -1,7 +1,7 @@
-import { Point } from "../common";
-import { physFromPx, PHYSICS_SCALE } from "../constants";
-import { Level } from "../game/level";
-import { Aseprite } from "../lib/aseprite";
+import { Point } from "../../common";
+import { physFromPx, PHYSICS_SCALE } from "../../constants";
+import { Level } from "../level";
+import { Aseprite } from "../../lib/aseprite";
 import { Entity } from "./entity";
 
 export class Sprite extends Entity {

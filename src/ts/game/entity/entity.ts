@@ -1,7 +1,7 @@
-import { Dir, Dirs, FacingDir, Point } from "../common";
-import { FPS, PHYSICS_SCALE } from "../constants";
-import { Level } from "../game/level";
-import { Tile } from "../game/tiles";
+import { Dir, Dirs, FacingDir, Point } from "../../common";
+import { FPS, PHYSICS_SCALE } from "../../constants";
+import { Level } from "../level";
+import { Tile } from "../tiles";
 
 export class Entity {
     level: Level;

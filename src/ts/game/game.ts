@@ -1,6 +1,6 @@
 import { GAME_HEIGHT_PX, GAME_WIDTH_PX, physFromPx, PHYSICS_SCALE, pxFromPhys, SELECT_KEYS, TIME_STEP } from "../constants";
-import { Seed, SeedType } from "../entity/seed";
-import { Sprite } from "../entity/sprite";
+import { Seed, SeedType } from "./entity/seed";
+import { Sprite } from "./entity/sprite";
 import { Aseprite } from "../lib/aseprite";
 import { Images } from "../lib/images";
 import { KeyboardKeys, NullKeys, RegularKeys } from "../lib/keys";

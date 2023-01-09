@@ -1,12 +1,12 @@
-import { FacingDir, Point } from "../common";
-import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, PLANT_KEYS, RIGHT_KEYS, rng, TILE_SIZE } from "../constants";
-import { Level } from "../game/level";
-import { SFX } from "../game/sfx";
-import { Tile } from "../game/tiles";
-import { Aseprite } from "../lib/aseprite";
-import { NullKeys } from "../lib/keys";
-import { Sounds } from "../lib/sounds";
-import { lerp } from "../lib/util";
+import { FacingDir, Point } from "../../common";
+import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, PLANT_KEYS, RIGHT_KEYS, rng, TILE_SIZE } from "../../constants";
+import { Level } from "../level";
+import { SFX } from "../sfx";
+import { Tile } from "../tiles";
+import { Aseprite } from "../../lib/aseprite";
+import { NullKeys } from "../../lib/keys";
+import { Sounds } from "../../lib/sounds";
+import { lerp } from "../../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
 
