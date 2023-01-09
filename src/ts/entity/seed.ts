@@ -266,6 +266,17 @@ export class Seed extends Entity {
         this.planting = true;
         this.animCount = 0;
         const xCoords = [this.midX, this.minX, this.maxX];
+
+        // If this is a flower, make sure we're planting at the glowing spot if possible.
+        if (this.type == SeedType.Flower) {
+
+            for (const xCoord of xCoords) {
+                if (this.level.tiles.getTileAtCoord({x: xCoord, y: this.maxY}) == Tile.Glow) {
+                    this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
+                    return;
+                }
+            }
+        }
         for (const xCoord of xCoords) {
             if (this.level.tiles.getTileAtCoord({x: xCoord, y: this.maxY + 1}) == Tile.Wall) {
                 this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;

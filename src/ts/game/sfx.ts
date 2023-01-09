@@ -27,7 +27,7 @@ const sfx = {
         p_lpf_resonance: 0,
         p_hpf_freq: 0.027571379671559426,
         p_hpf_ramp: 0,
-        sound_vol: 0.10,
+        sound_vol: 0.08,
         sample_rate: 44100,
         sample_size: 8,
     },
