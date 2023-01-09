@@ -245,15 +245,20 @@ export class Seed extends Entity {
         const above = {x: this.midX, y: this.maxY - TILE_SIZE};
         if (this.level.tiles.getTileAtCoord(above) == Tile.Wall) {
             this.level.tiles.setTileAtCoord(pos, Tile.DeadPlant);
+            SFX.play('growFail');
             return;
         }
 
         this.level.tiles.setTileAtCoord(pos, Tile.Plant);
         this.level.tiles.setTileAtCoord(above, Tile.PlantTop);
+
+        SFX.play('grow');
     }
 
     growDirt() {
         this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.Wall);
+
+        SFX.play('growDirt');
     }
 
     tryGrowFlower() {
@@ -262,11 +267,14 @@ export class Seed extends Entity {
             flower.midX = this.midX;
             flower.maxY = this.maxY;
             this.level.entities.push(flower);
+
+            SFX.play('growFlower');
             return;
         }
 
         // Not a glowing place... so it dies :(
         this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.DeadPlant);
+        SFX.play('growFail');
     }
 
     explode() {
@@ -280,12 +288,13 @@ export class Seed extends Entity {
             }
         }
         // Explode animation
-        // TODO: Explode SFX
         const explodeSprite = new Sprite(this.level, 'explosion', {oneLoop: true, anchorRatios: {x: 0.5, y: 0.5}});
         const explodePos = this.level.tiles.getTileCoordFromCoord({x: this.midX, y: this.maxY}, {x: 0.5, y: 0.5});
         explodeSprite.midX = explodePos.x;
         explodeSprite.midY = explodePos.y;
         this.level.entities.push(explodeSprite);
+
+        SFX.play('explode');
     }
 
     plant() {
