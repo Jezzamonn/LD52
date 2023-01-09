@@ -159,6 +159,9 @@ export class SeedPicker {
     }
 
     getDescription(type: SeedType | string): string {
+        if (type == 'next') {
+            return 'Next (press space)'
+        }
         if (typeof type === 'string') {
             return type[0].toUpperCase() + type.slice(1);
         }
