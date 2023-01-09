@@ -2,6 +2,8 @@
 !promo/publish/
 
 /build/
+*.zip
+
 .vscode/
 node_modules
 profiles/
