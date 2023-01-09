@@ -85,6 +85,10 @@ export class Game {
         this.startLevel((this.levelIndex + 1) % LEVELS.length);
     }
 
+    prevLevel() {
+        this.startLevel((this.levelIndex + LEVELS.length - 1) % LEVELS.length);
+    }
+
     startLevel(levelIndex: number) {
         this.levelIndex = levelIndex;
         const levelInfo = LEVELS[this.levelIndex];
@@ -139,6 +143,9 @@ export class Game {
     debugInput() {
         if (this.curLevel!.won && this.keys.anyWasPressedThisFrame(SELECT_KEYS)) {
             this.nextLevel();
+        }
+        if (this.keys.wasPressedThisFrame('Comma')) {
+            this.prevLevel();
         }
         if (this.keys.wasPressedThisFrame('Period')) {
             this.nextLevel();

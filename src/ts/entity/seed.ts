@@ -115,6 +115,7 @@ export class Seed extends Entity {
 
     jump() {
         this.dy = -this.jumpSpeed;
+        SFX.play('walk');
     }
 
     // TODO: Some easing?
@@ -134,7 +135,6 @@ export class Seed extends Entity {
 
         const { animName, loop } = this.getAnimationName();
         if (animName == 'run') {
-            // SFX.play('walk');
             const startFrame = Aseprite.getFrame('seed', 'run', 0)
 
             const prevFrame = Aseprite.getFrame('seed', 'run', prevAnimCount);
