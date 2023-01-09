@@ -35,9 +35,9 @@ export class FocusCamera extends Camera {
         this.curPos.y = lerp(this.curPos.y, targetPos.y, updateSmoothness);
     }
 
-    applyTransform(context: CanvasRenderingContext2D) {
+    applyTransform(context: CanvasRenderingContext2D, scale=1) {
         if (this.curPos) {
-            context.translate(Math.round(-this.curPos.x), Math.round(-this.curPos.y));
+            context.translate(Math.round(-scale * this.curPos.x), Math.round(-scale * this.curPos.y));
         }
     }
 }

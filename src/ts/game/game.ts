@@ -11,6 +11,7 @@ import { Levels, LEVELS } from "./levels";
 import { SeedPicker } from "./seedpicker";
 import { SFX } from "./sfx";
 import { Tiles } from "./tiles";
+import { Background } from "./background";
 
 export class Game {
 
@@ -176,10 +177,14 @@ export class Game {
         }
     }
 
+    applyScale(context: CanvasRenderingContext2D) {
+        context.scale(this.scale, this.scale);
+    }
+
     render() {
         this.context.resetTransform();
         centerCanvas(this.context);
-        this.context.scale(this.scale, this.scale);
+        this.applyScale(this.context);
 
         try {
             this.curLevel?.render(this.context);
@@ -214,6 +219,7 @@ export class Game {
             Tiles.preload(),
             Seed.preload(),
             Sprite.preload(),
+            Background.preload(),
         ]);
         SFX.preload();
     }

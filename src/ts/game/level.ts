@@ -8,6 +8,7 @@ import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { LevelInfo } from "./levels";
 import { Tile, Tiles } from "./tiles";
+import { Background } from "./background";
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
@@ -18,6 +19,7 @@ export class Level {
     remainingSeeds: SeedType[] = [];
 
     camera: FocusCamera = new FocusCamera();
+    background: Background = new Background(this);
 
     tiles: Tiles = new Tiles(0, 0);
 
@@ -122,6 +124,7 @@ export class Level {
             }
         }
 
+        this.background.update(dt);
         this.tiles.update(dt);
         this.camera.update(dt);
     }
@@ -130,6 +133,8 @@ export class Level {
         this.camera.applyTransform(context);
 
         this.renderSky(context);
+
+        this.background.render(context);
 
         this.tiles.render(context);
 
