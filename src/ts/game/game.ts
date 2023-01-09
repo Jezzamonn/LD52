@@ -107,15 +107,15 @@ export class Game {
 
     showPicker() {
         if (this.curLevel!.won) {
-            this.seedPicker.show(['next']);
+            this.seedPicker.show(['next'], 1);
         }
         else if (this.curLevel!.remainingSeeds.length == 0) {
-            this.seedPicker.show(['retry']);
+            this.seedPicker.show(['retry'], 0.5);
         }
         else {
             const options: (SeedType | string)[] = this.curLevel!.remainingSeeds.slice();
             options.push('retry');
-            this.seedPicker.show(options);
+            this.seedPicker.show(options, 0.5);
         }
     }
 
@@ -143,10 +143,7 @@ export class Game {
         requestAnimationFrame(() => this.doAnimationLoop());
     }
 
-    debugInput() {
-        if (this.curLevel!.won && this.keys.anyWasPressedThisFrame(SELECT_KEYS)) {
-            this.nextLevel();
-        }
+    handleInput() {
         if (this.keys.wasPressedThisFrame('Comma')) {
             this.prevLevel();
         }
@@ -164,7 +161,7 @@ export class Game {
 
     update(dt: number) {
         try {
-            this.debugInput();
+            this.handleInput();
 
             this.seedPicker.update(dt);
 
