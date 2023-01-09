@@ -63,7 +63,6 @@ export class SeedPicker {
     }
 
     async show(seedTypes: (SeedType|string)[], delay: number = 0) {
-        await new Promise(resolve => setTimeout(resolve, delay * 1000));
         await this.setSeedTypes(seedTypes);
 
         this.elem.classList.remove('seed-picker__closed');

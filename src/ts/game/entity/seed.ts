@@ -162,10 +162,10 @@ export class Seed extends Entity {
                 SFX.play('walk');
             }
         } else if (animName == 'plant') {
-            const startFrame = Aseprite.getFrame('seed', 'plant', 0)
+            const startFrame = Aseprite.getFrame('seed', 'plant', 0, false)
 
-            const prevFrame = Aseprite.getFrame('seed', 'plant', prevAnimCount);
-            const frame = Aseprite.getFrame('seed', 'plant', this.animCount);
+            const prevFrame = Aseprite.getFrame('seed', 'plant', prevAnimCount, false);
+            const frame = Aseprite.getFrame('seed', 'plant', this.animCount, false);
             if (prevFrame != frame && (frame == startFrame + 3)) {
                 SFX.play('bury');
             }
@@ -178,16 +178,16 @@ export class Seed extends Entity {
             this.midX = lerp(this.midX, this.plantX, updateAmt);
 
             if (this.animCount > Aseprite.images['seed'].animations['plant'].length / 1000) {
-                this.planted = true;
-
-                if (this.controlledByPlayer) {
+                if (!this.planted && this.controlledByPlayer) {
                     this.level.endDay();
                 }
+                this.planted = true;
+
             }
             return;
         }
 
-        if (keys.anyWasPressedThisFrame(JUMP_KEYS)) {
+        if (this.isStanding() && keys.anyWasPressedThisFrame(JUMP_KEYS)) {
             this.jump();
         } else if (this.isOnGround() && keys.anyWasPressedThisFrame(PLANT_KEYS)) {
             this.plant();

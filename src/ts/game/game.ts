@@ -12,6 +12,7 @@ import { SeedPicker } from "./seedpicker";
 import { SFX } from "./sfx";
 import { Tiles } from "./tiles";
 import { Background } from "./background";
+import { wait } from "../lib/util";
 
 export class Game {
 
@@ -105,18 +106,39 @@ export class Game {
         }
     }
 
-    showPicker() {
+    async endDay() {
+        // Show our animation! :D
+        this.playDayTransition();
+        await wait(0.8);
+        this.curLevel!.advanceDay();
+        await wait(1.3);
+
         if (this.curLevel!.won) {
-            this.seedPicker.show(['next'], 1);
+            // Wait a little longer.
+            await wait(0.5);
+            this.seedPicker.show(['next']);
         }
         else if (this.curLevel!.remainingSeeds.length == 0) {
-            this.seedPicker.show(['retry'], 0.5);
+            this.seedPicker.show(['retry']);
         }
         else {
             const options: (SeedType | string)[] = this.curLevel!.remainingSeeds.slice();
             options.push('retry');
-            this.seedPicker.show(options, 0.5);
+            this.seedPicker.show(options);
         }
+    }
+
+    playDayTransition() {
+        const nightOverlay = document.querySelector('.night-overlay')!;
+        nightOverlay.classList.remove('night-overlay__animated');
+        nightOverlay.clientHeight; // Force reflow
+        nightOverlay.classList.remove('hidden');
+        nightOverlay.classList.add('night-overlay__animated');
+        const onAnimtationEnd = () => {
+            nightOverlay.classList.add('hidden');
+            nightOverlay.removeEventListener('animationend', onAnimtationEnd);
+        }
+        nightOverlay.addEventListener('animationend', onAnimtationEnd);
     }
 
     doAnimationLoop() {
@@ -202,6 +224,8 @@ export class Game {
         // Math.min = scale to fit
         const pxScale = Math.floor(Math.min(xScale, yScale) * pixelScale);
         this.scale = pxScale / PHYSICS_SCALE;
+
+        document.body.style.setProperty('--scale', `${pxScale / pixelScale}`);
 
         this.canvas.width = windowWidth * pixelScale;
         this.canvas.height = windowHeight * pixelScale;

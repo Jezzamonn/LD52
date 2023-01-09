@@ -85,7 +85,7 @@ export class Level {
         this.camera.target = () => ({x: this.start.x, y: this.start.y});
     }
 
-    endDay() {
+    advanceDay() {
         // Update the tiles in the level.
         this.tiles.advanceDay();
 
@@ -101,8 +101,10 @@ export class Level {
                 this.won = true;
             }
         }
+    }
 
-        this.game.showPicker();
+    endDay() {
+        this.game.endDay();
     }
 
     spawnPlayer(seedType: SeedType) {

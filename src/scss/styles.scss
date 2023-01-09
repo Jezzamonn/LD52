@@ -7,6 +7,10 @@ html, body {
     background-color: black;
 }
 
+body {
+    --scale: 1;
+}
+
 .hidden {
     display: none;
 }
@@ -104,4 +108,42 @@ html, body {
     image-rendering: crisp-edges;
 
     transition: transform 0.1s ease;
+}
+
+.night-overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@keyframes slideInAndOut {
+    from {
+        translate: -120vw 0;
+    }
+    to {
+        translate: 120vw 0;
+    }
+}
+
+.night-overlay {
+    transform-origin: top;
+    transform: scale(var(--scale));
+
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+
+    z-index: 10;
+}
+
+.night-overlay__animated {
+    animation: slideInAndOut 0.5s linear;
 }
