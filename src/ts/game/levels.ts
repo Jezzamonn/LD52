@@ -25,7 +25,7 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Vine,
             SeedType.Flower,
         ],
-        text: 'The Teeny Seed wandered the fields until he found a friend.',
+        // text: 'The Teeny Seed wandered the fields until he found a friend.',
     },
     {
         name: 'vine-misdirection',
