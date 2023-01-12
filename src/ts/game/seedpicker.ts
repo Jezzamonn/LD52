@@ -189,8 +189,9 @@ export class SeedPicker {
     }
 
     async createSeedImage(seedType: SeedType): Promise<HTMLElement> {
-        const filter = Seeds.getFilter(seedType);
-        const seedSprite = Aseprite.applyFilter('seed', filter);
+        // const filter = Seeds.getFilter(seedType);
+        const imageName = Seeds.getImageName(seedType);
+        const seedSprite = Aseprite.images[imageName];imageName
 
         await seedSprite.loadPromise!;
 

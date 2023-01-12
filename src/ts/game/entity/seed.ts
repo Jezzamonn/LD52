@@ -17,6 +17,8 @@ export enum SeedType {
     Flower,
 }
 
+const seedTypes = [SeedType.Vine, SeedType.Dirt, SeedType.Bomb, SeedType.Flower];
+
 export class Seeds {
     static nextSeed(s: SeedType): SeedType {
         if (s == SeedType.Flower) {
@@ -25,16 +27,30 @@ export class Seeds {
         return s + 1;
     }
 
-    static getFilter(s: SeedType) {
+    // Can't use filters in Safari :(
+    // static getFilter(s: SeedType) {
+    //     switch (s) {
+    //         case SeedType.Vine:
+    //             return '';
+    //         case SeedType.Dirt:
+    //             return 'hue-rotate(-100deg) saturate(0.3)';
+    //         case SeedType.Bomb:
+    //             return 'hue-rotate(-30deg) saturate(2)';
+    //         case SeedType.Flower:
+    //             return 'hue-rotate(180deg) saturate(1.1)';
+    //     }
+    // }
+
+    static getImageName(s: SeedType) {
         switch (s) {
             case SeedType.Vine:
-                return '';
+                return 'seed';
             case SeedType.Dirt:
-                return 'hue-rotate(-100deg) saturate(0.3)';
+                return 'seed-dirt';
             case SeedType.Bomb:
-                return 'hue-rotate(-30deg) saturate(2)';
+                return 'seed-bomb';
             case SeedType.Flower:
-                return 'hue-rotate(180deg) saturate(1.1)';
+                return 'seed-flower';
         }
     }
 
@@ -110,17 +126,18 @@ export class Seed extends Entity {
     render(context: CanvasRenderingContext2D) {
         const {animName, loop} = this.getAnimationName();
 
-        let filter = Seeds.getFilter(this.type);
+        // let filter = Seeds.getFilter(this.type);
+        let imageName = Seeds.getImageName(this.type);
 
         Aseprite.drawAnimation({
             context,
-            image: 'seed',
+            image: imageName,
             animationName: animName,
             time: this.animCount,
             position: {x: this.midX, y: this.maxY},
             scale: PHYSICS_SCALE,
             anchorRatios: {x: 0.5, y: 1},
-            filter: filter,
+            // filter: filter,
             flippedX: this.facingDir == FacingDir.Left,
             loop,
         });
@@ -328,6 +345,12 @@ export class Seed extends Entity {
     }
 
     static async preload() {
-        await Aseprite.loadImage({name: 'seed', basePath: 'sprites'})
+        // await Aseprite.loadImage({name: 'seed', basePath: 'sprites'})
+        const promises: Promise<Object>[] = [];
+        for (const seedType of seedTypes) {
+            const imageName = Seeds.getImageName(seedType);
+            promises.push(Aseprite.loadImage({name: imageName, basePath: 'sprites'}));
+        }
+        await Promise.all(promises);
     }
 }
