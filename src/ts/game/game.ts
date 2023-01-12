@@ -124,7 +124,7 @@ export class Game {
         // Show our animation! :D
         this.playDayTransition();
         SFX.play('sweep');
-        await wait(0.3 + extraDelay);
+        await wait(0.6 + extraDelay);
         this.curLevel!.advanceDay();
         await wait(1.3);
 
