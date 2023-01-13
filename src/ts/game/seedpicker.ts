@@ -162,6 +162,9 @@ export class SeedPicker {
         if (type == 'next') {
             return 'Next (press space)'
         }
+        if (type == 'retry') {
+            return 'Retry (you can also do this at any time by pressing R)';
+        }
         if (typeof type === 'string') {
             return type[0].toUpperCase() + type.slice(1);
         }
