@@ -10,6 +10,7 @@ export enum Tile {
     PlantTop = 3,
     DeadPlant = 4,
     Glow = 5,
+    Cave = 6, // Darker background.
 }
 
 /**
@@ -109,7 +110,45 @@ export class Tiles {
                         if (dxTile == Tile.Wall) {
                             tilePos = { x: 0, y: 1 };
                         } else {
-                            tilePos = { x: 0, y: 0 };
+                            // Edge corner piece
+                            if (dxdyTile == Tile.Cave) {
+                                tilePos = { x: 0, y: 5 };
+                            } else {
+                                tilePos = { x: 0, y: 0 };
+                            }
+                        }
+                    }
+                    this.drawQuarterTile(
+                        context,
+                        {
+                            tilePos,
+                            subTilePos,
+                            renderPos
+                        }
+                    );
+                }
+            }
+        } else if (tile == Tile.Cave) {
+            // A similar set of conditions as for the walls.
+            for (const dx of [-1, 1]) {
+                const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
+                for (const dy of [-1, 1]) {
+                    const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
+                    const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
+                    // Don't need dxdyTile here.
+                    let tilePos: Point;
+
+                    if (dyTile == Tile.Cave || dyTile == Tile.Wall) {
+                        if (dxTile == Tile.Cave || dxTile == Tile.Wall) {
+                            tilePos = { x: 3, y: 3 };
+                        } else {
+                            tilePos = { x: 3, y: 2 };
+                        }
+                    } else {
+                        if (dxTile == Tile.Cave || dxTile == Tile.Wall) {
+                            tilePos = { x: 3, y: 1 };
+                        } else {
+                            tilePos = { x: 3, y: 0 };
                         }
                     }
                     this.drawQuarterTile(

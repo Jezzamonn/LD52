@@ -309,7 +309,12 @@ export class Seed extends Entity {
                     x: this.midX + dx * TILE_SIZE,
                     y: this.maxY + dy * TILE_SIZE
                 };
-                this.level.tiles.setTileAtCoord(p, Tile.Empty);
+                const prevTile = this.level.tiles.getTileAtCoord(p);
+                let newTile = Tile.Empty;
+                if (prevTile == Tile.Wall || prevTile == Tile.Cave) {
+                    newTile = Tile.Cave;
+                }
+                this.level.tiles.setTileAtCoord(p, newTile);
             }
         }
         // Explode animation

@@ -64,6 +64,9 @@ export class Level {
                 else if (color === '000000') {
                     this.tiles.setTile({ x, y }, Tile.Wall);
                 }
+                else if (color === 'aaaaaa') {
+                    this.tiles.setTile({ x, y }, Tile.Cave);
+                }
                 else if (color === 'ffff00') {
                     this.tiles.setTile({ x, y }, Tile.Glow);
                     // const glow = new Sprite(this, 'glow');
@@ -73,6 +76,13 @@ export class Level {
                 }
                 else if (color === 'ff0000') {
                     this.start = basePos;
+                    // Set this tile as either cave or empty based on the previous tile.
+                    if (this.tiles.getTile({ x: x - 1, y }) === Tile.Cave) {
+                        this.tiles.setTile({ x, y }, Tile.Cave);
+                    }
+                    else {
+                        this.tiles.setTile({ x, y }, Tile.Empty);
+                    }
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
