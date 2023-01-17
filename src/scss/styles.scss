@@ -221,8 +221,8 @@ h2 {
 
 .touch-button {
     position: absolute;
-    width: 20vw;
-    height: 20vw;
+    width: 20vmin;
+    height: 20vmin;
 
     display: flex;
     justify-content: center;
@@ -232,7 +232,7 @@ h2 {
 .touch-button-left-right {
     bottom: 0;
     left: 0;
-    width: 40vw;
+    width: 40vmin;
 }
 
 .touch-button-jump {
@@ -241,7 +241,7 @@ h2 {
 }
 
 .touch-button-plant {
-    bottom: 20vw;
+    bottom: 20vmin;
     right: 0;
 }
 
