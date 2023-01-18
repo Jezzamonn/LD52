@@ -10,7 +10,7 @@ import { Level } from "./level";
 import { Levels, LEVELS } from "./levels";
 import { SeedPicker } from "./seedpicker";
 import { SFX } from "./sfx";
-import { Tiles } from "./tiles";
+import { Tiles } from "./tile/tiles";
 import { Background } from "./background";
 import { wait } from "../lib/util";
 

@@ -1,6 +1,6 @@
-import { Point } from "../common";
-import { PHYSICS_SCALE, TILE_SIZE } from "../constants";
-import { Aseprite } from "../lib/aseprite";
+import { Point } from "../../common";
+import { PHYSICS_SCALE, TILE_SIZE } from "../../constants";
+import { Aseprite } from "../../lib/aseprite";
 import { TileLayer } from "./tile-layer";
 
 export enum ObjectTile {

@@ -1,7 +1,7 @@
-import { Point } from "../common";
-import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../constants";
-import { Aseprite, images } from "../lib/aseprite";
-import { Images } from "../lib/images";
+import { Point } from "../../common";
+import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../../constants";
+import { Aseprite, images } from "../../lib/aseprite";
+import { Images } from "../../lib/images";
 import { BaseLayer, BaseTile } from "./base-layer";
 import { ObjectLayer, ObjectTile } from "./object-layer";
 

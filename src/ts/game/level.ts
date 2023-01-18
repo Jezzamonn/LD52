@@ -7,10 +7,10 @@ import { Images } from "../lib/images";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { LevelInfo } from "./levels";
-import { Tiles } from "./tiles";
+import { Tiles } from "./tile/tiles";
 import { Background } from "./background";
-import { BaseTile } from "./base-layer";
-import { ObjectTile } from "./object-layer";
+import { BaseTile } from "./tile/base-layer";
+import { ObjectTile } from "./tile/object-layer";
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {

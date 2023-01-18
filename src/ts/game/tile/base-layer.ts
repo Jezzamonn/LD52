@@ -1,5 +1,5 @@
-import { Point } from "../common";
-import { TILE_SIZE } from "../constants";
+import { Point } from "../../common";
+import { TILE_SIZE } from "../../constants";
 import { TileLayer } from "./tile-layer";
 
 export enum BaseTile {

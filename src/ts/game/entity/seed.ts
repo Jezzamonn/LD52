@@ -8,9 +8,9 @@ import { Sounds } from "../../lib/sounds";
 import { lerp } from "../../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
-import { BaseTile } from "../base-layer";
-import { PhysicTile } from "../tiles";
-import { ObjectTile } from "../object-layer";
+import { BaseTile } from "../tile/base-layer";
+import { PhysicTile } from "../tile/tiles";
+import { ObjectTile } from "../tile/object-layer";
 
 export enum SeedType {
     Vine,
