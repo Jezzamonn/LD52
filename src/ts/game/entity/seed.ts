@@ -1,14 +1,16 @@
-import { FacingDir, Point } from "../../common";
+import { Dir, FacingDir, Point } from "../../common";
 import { FPS, JUMP_KEYS, LEFT_KEYS, physFromPx, PHYSICS_SCALE, PLANT_KEYS, RIGHT_KEYS, rng, TILE_SIZE } from "../../constants";
 import { Level } from "../level";
 import { SFX } from "../sfx";
-import { Tile } from "../tiles";
 import { Aseprite } from "../../lib/aseprite";
 import { NullKeys } from "../../lib/keys";
 import { Sounds } from "../../lib/sounds";
 import { lerp } from "../../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
+import { BaseTile } from "../base-layer";
+import { PhysicTile } from "../tiles";
+import { ObjectTile } from "../object-layer";
 
 export enum SeedType {
     Vine,
@@ -206,7 +208,7 @@ export class Seed extends Entity {
 
         if (this.isStanding() && keys.anyWasPressedThisFrame(JUMP_KEYS)) {
             this.jump();
-        } else if (this.isOnGround() && keys.anyWasPressedThisFrame(PLANT_KEYS)) {
+        } else if (this.canPlant() && keys.anyWasPressedThisFrame(PLANT_KEYS)) {
             this.plant();
         }
 
@@ -225,6 +227,10 @@ export class Seed extends Entity {
         this.applyGravity(dt);
         this.moveX(dt);
         this.moveY(dt);
+    }
+
+    canPlant(): boolean {
+        return this.isTouchingTile(this.level.tiles.baseLayer, BaseTile.Dirt, { dir: Dir.Down, offset: { x: 0, y: 1 } })
     }
 
     applyGravity(dt: number): void {
@@ -268,26 +274,26 @@ export class Seed extends Entity {
         // Check if we have enough space.
         const pos = {x: this.midX, y: this.maxY};
         const above = {x: this.midX, y: this.maxY - TILE_SIZE};
-        if (this.level.tiles.getTileAtCoord(above) == Tile.Wall) {
-            this.level.tiles.setTileAtCoord(pos, Tile.DeadPlant);
+        if (this.level.tiles.getTileAtCoord(above) == PhysicTile.Wall) {
+            this.level.tiles.objectLayer.setTileAtCoord(pos, ObjectTile.DeadPlant);
             SFX.play('growFail');
             return;
         }
 
-        this.level.tiles.setTileAtCoord(pos, Tile.Plant);
-        this.level.tiles.setTileAtCoord(above, Tile.PlantTop);
+        this.level.tiles.objectLayer.setTileAtCoord(pos, ObjectTile.PlantBase);
+        this.level.tiles.objectLayer.setTileAtCoord(above, ObjectTile.PlantTop);
 
         SFX.play('grow');
     }
 
     growDirt() {
-        this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.Wall);
+        this.level.tiles.baseLayer.setTileAtCoord({x: this.midX, y: this.maxY}, BaseTile.Dirt);
 
         SFX.play('growDirt');
     }
 
     tryGrowFlower() {
-        if (this.isTouchingTile(Tile.Glow)) {
+        if (this.isTouchingTile(this.level.tiles.objectLayer, ObjectTile.Glow)) {
             const flower = new Sprite(this.level, 'flower');
             flower.midX = this.midX;
             flower.maxY = this.maxY;
@@ -298,7 +304,7 @@ export class Seed extends Entity {
         }
 
         // Not a glowing place... so it dies :(
-        this.level.tiles.setTileAtCoord({x: this.midX, y: this.maxY}, Tile.DeadPlant);
+        this.level.tiles.objectLayer.setTileAtCoord({x: this.midX, y: this.maxY}, ObjectTile.DeadPlant);
         SFX.play('growFail');
     }
 
@@ -309,14 +315,11 @@ export class Seed extends Entity {
                     x: this.midX + dx * TILE_SIZE,
                     y: this.maxY + dy * TILE_SIZE
                 };
-                const prevTile = this.level.tiles.getTileAtCoord(p);
-                let newTile = Tile.Empty;
-                if (prevTile == Tile.Wall || prevTile == Tile.Cave) {
-                    newTile = Tile.Cave;
-                }
-                this.level.tiles.setTileAtCoord(p, newTile);
+                this.level.tiles.explodeAtCoord(p);
             }
         }
+        this.level.tiles.fixInvalidTiles();
+
         // Explode animation
         const explodeSprite = new Sprite(this.level, 'explosion', {oneLoop: true, anchorRatios: {x: 0.5, y: 0.5}});
         const explodePos = this.level.tiles.getTileCoordFromCoord({x: this.midX, y: this.maxY}, {x: 0.5, y: 0.5});
@@ -336,14 +339,14 @@ export class Seed extends Entity {
         if (this.type == SeedType.Flower) {
 
             for (const xCoord of xCoords) {
-                if (this.level.tiles.getTileAtCoord({x: xCoord, y: this.maxY}) == Tile.Glow) {
+                if (this.level.tiles.objectLayer.getTileAtCoord({x: xCoord, y: this.maxY}) == ObjectTile.Glow) {
                     this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
                     return;
                 }
             }
         }
         for (const xCoord of xCoords) {
-            if (this.level.tiles.getTileAtCoord({x: xCoord, y: this.maxY + 1}) == Tile.Wall) {
+            if (this.level.tiles.baseLayer.getTileAtCoord({x: xCoord, y: this.maxY + 1}) == BaseTile.Dirt) {
                 this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
             }
         }

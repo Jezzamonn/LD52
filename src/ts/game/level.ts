@@ -7,8 +7,10 @@ import { Images } from "../lib/images";
 import { Camera, FocusCamera } from "./camera";
 import { Game } from "./game";
 import { LevelInfo } from "./levels";
-import { Tile, Tiles } from "./tiles";
+import { Tiles } from "./tiles";
 import { Background } from "./background";
+import { BaseTile } from "./base-layer";
+import { ObjectTile } from "./object-layer";
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
@@ -59,16 +61,18 @@ export class Level {
 
                 const color = pixelToColorString(imageData, x, y);
                 if (color === 'ffffff') {
-                    this.tiles.setTile({ x, y }, Tile.Empty);
+                    // Don't need to do anything for empty tiles as they're the default.
                 }
                 else if (color === '000000') {
-                    this.tiles.setTile({ x, y }, Tile.Wall);
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Dirt);
                 }
                 else if (color === 'aaaaaa') {
-                    this.tiles.setTile({ x, y }, Tile.Cave);
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Cave);
                 }
                 else if (color === 'ffff00') {
-                    this.tiles.setTile({ x, y }, Tile.Glow);
+                    this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Glow);
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown);
+
                     // const glow = new Sprite(this, 'glow');
                     // glow.midX = basePos.x;
                     // glow.maxY = basePos.y;
@@ -76,19 +80,14 @@ export class Level {
                 }
                 else if (color === 'ff0000') {
                     this.start = basePos;
-                    // Set this tile as either cave or empty based on the previous tile.
-                    if (this.tiles.getTile({ x: x - 1, y }) === Tile.Cave) {
-                        this.tiles.setTile({ x, y }, Tile.Cave);
-                    }
-                    else {
-                        this.tiles.setTile({ x, y }, Tile.Empty);
-                    }
+                    this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown);
                 }
                 else {
                     console.log(`Unknown color: ${color} at ${x}, ${y}.`);
                 }
             }
         }
+        this.tiles.baseLayer.fillInUnknownTiles();
 
         this.remainingSeeds = this.levelInfo.seeds.slice();
 

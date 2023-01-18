@@ -1,7 +1,7 @@
 import { Dir, Dirs, FacingDir, Point } from "../../common";
 import { FPS, PHYSICS_SCALE } from "../../constants";
 import { Level } from "../level";
-import { Tile } from "../tiles";
+import { PhysicTile, TileSource } from "../tiles";
 
 export class Entity {
     level: Level;
@@ -66,18 +66,18 @@ export class Entity {
         }
 
         if (this.dx < 0) {
-            if (this.isTouchingTile(Tile.Wall, { dir: Dir.Left })) {
+            if (this.isTouchingTile(this.level.tiles, PhysicTile.Wall, { dir: Dir.Left })) {
                 this.onLeftCollision();
             }
         } else if (this.dx > 0) {
-            if (this.isTouchingTile(Tile.Wall, { dir: Dir.Right })) {
+            if (this.isTouchingTile(this.level.tiles, PhysicTile.Wall, { dir: Dir.Right })) {
                 this.onRightCollision();
             }
         }
     }
 
     moveY(dt: number) {
-        const wasTouchingPlantTop = this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down });
+        const wasTouchingPlantTop = this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down });
         this.y += this.dy * dt;
 
         this.y = Math.round(this.y);
@@ -87,14 +87,14 @@ export class Entity {
         }
 
         if (this.dy < 0) {
-            if (this.isTouchingTile(Tile.Wall, { dir: Dir.Up })) {
+            if (this.isTouchingTile(this.level.tiles, PhysicTile.Wall, { dir: Dir.Up })) {
                 this.onUpCollision();
             }
         } else if (this.dy > 0) {
-            if (this.isTouchingTile(Tile.Wall, { dir: Dir.Down })) {
+            if (this.isTouchingTile(this.level.tiles, PhysicTile.Wall, { dir: Dir.Down })) {
                 this.onDownCollision();
             }
-            if (!wasTouchingPlantTop && this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down })) {
+            if (!wasTouchingPlantTop && this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down })) {
                 this.onDownCollision();
             }
         }
@@ -128,7 +128,7 @@ export class Entity {
         this.dy = 0;
     }
 
-    isTouchingTile(tile: Tile | Tile[], { dir = undefined, offset = undefined } : { dir?: Dir, offset?: Point } = {}): boolean {
+    isTouchingTile<T extends number>(tileSource: TileSource<T>, tile: T | T[], { dir = undefined, offset = undefined } : { dir?: Dir, offset?: Point } = {}): boolean {
         if (!Array.isArray(tile)) {
             tile = [tile];
         }
@@ -137,7 +137,7 @@ export class Entity {
             const x = this.x + corner.x * this.w + (offset?.x ?? 0);
             const y = this.y + corner.y * this.h + (offset?.y ?? 0);
             for (const t of tile) {
-                if (this.level.tiles.getTileAtCoord({x, y}) === t) {
+                if (tileSource.getTileAtCoord({x, y}) === t) {
                     return true;
                 }
             }
@@ -146,12 +146,8 @@ export class Entity {
     }
 
     isStanding(): boolean {
-        return this.isTouchingTile([Tile.Wall, Tile.PlantTop], { dir: Dir.Down, offset: { x: 0, y: 1 } }) &&
-            !this.isTouchingTile(Tile.PlantTop, { dir: Dir.Down })
-    }
-
-    isOnGround(): boolean {
-        return this.isTouchingTile(Tile.Wall, { dir: Dir.Down, offset: { x: 0, y: 1 } })
+        return this.isTouchingTile(this.level.tiles, [PhysicTile.Wall, PhysicTile.OneWayPlatform], { dir: Dir.Down, offset: { x: 0, y: 1 } }) &&
+            !this.isTouchingTile(this.level.tiles, PhysicTile.OneWayPlatform, { dir: Dir.Down })
     }
 
     isTouchingEntity(other: Entity): boolean {

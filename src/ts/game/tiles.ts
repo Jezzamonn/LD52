@@ -2,323 +2,107 @@ import { Point } from "../common";
 import { PHYSICS_SCALE, rng, TILE_SIZE, TILE_SIZE_PX } from "../constants";
 import { Aseprite, images } from "../lib/aseprite";
 import { Images } from "../lib/images";
+import { BaseLayer, BaseTile } from "./base-layer";
+import { ObjectLayer, ObjectTile } from "./object-layer";
 
-export enum Tile {
+// All the types of tiles as far as how they interact with the game physics.
+export enum PhysicTile {
     Empty = 0,
     Wall = 1,
-    Plant = 2,
-    PlantTop = 3,
-    DeadPlant = 4,
-    Glow = 5,
-    Cave = 6, // Darker background.
+    OneWayPlatform = 2,
+}
+
+export interface TileSource<T extends number> {
+    getTile(p: Point): T;
+    getTileAtCoord(p: Point): T;
 }
 
 /**
  * 2D array of tiles.
  */
-export class Tiles {
-    tiles: Tile[][] = [];
+export class Tiles implements TileSource<PhysicTile> {
 
-    w = 0;
-    h = 0;
-    // Index of the top left corner of this level. Can move when the level grows.
-    x = 0;
-    y = 0;
-
-    animCount = 0;
-
-    image: HTMLImageElement | undefined;
+    baseLayer: BaseLayer;
+    objectLayer: ObjectLayer;
 
     constructor(w: number, h: number) {
-        this.w = w + 2;
-        this.h = h + 2;
-        this.x = 1;
-        this.y = 1;
-
-        // Fill with mostly empty, a floor and some walls.
-        for (let y = 0; y < this.h; y++) {
-            this.tiles[y] = [];
-            for (let x = 0; x < this.w; x++) {
-                this.tiles[y][x] = y == (this.h - 1) ? Tile.Wall : Tile.Empty;
-            }
-            this.tiles[y][0] = Tile.Wall;
-            this.tiles[y][this.w - 1] = Tile.Wall;
-        }
+        this.baseLayer = new BaseLayer(w, h);
+        this.objectLayer = new ObjectLayer(w, h);
     }
 
     update(dt: number) {
-        this.animCount += dt;
+        this.baseLayer.update(dt);
+        this.objectLayer.update(dt);
     }
 
     render(context: CanvasRenderingContext2D) {
-        if (!this.image) {
-            const imageInfo = Images.images["tiles"];
-            if (!imageInfo.loaded) {
-                return;
-            }
-            this.image = imageInfo.image;
-        }
+        this.baseLayer.render(context);
+        this.objectLayer.render(context);
+    }
 
-        const invMatrix = context.getTransform().inverse();
-        const gameMinPoint = invMatrix.transformPoint({ x: 0, y: 0 });
-        const gameMaxPoint = invMatrix.transformPoint({
-            x: context.canvas.width,
-            y: context.canvas.height,
-        });
+    explodeAtCoord(p: Point) {
+        this.objectLayer.setTileAtCoord(p, ObjectTile.Empty);
+        this.baseLayer.explodeAtCoord(p);
+    }
 
-        const minXTile = Math.floor(gameMinPoint.x / TILE_SIZE);
-        const minYTile = Math.floor(gameMinPoint.y / TILE_SIZE);
-        const maxXTile = Math.floor(gameMaxPoint.x / TILE_SIZE);
-        const maxYTile = Math.floor(gameMaxPoint.y / TILE_SIZE);
+    fixInvalidTiles() {
+        // Replace all invalid things with empty.
+        let startX = Math.min(this.baseLayer.x, this.objectLayer.x);
+        let startY = Math.min(this.baseLayer.y, this.objectLayer.y);
+        let endX = Math.max(this.baseLayer.x + this.baseLayer.w - 1, this.objectLayer.x + this.objectLayer.w - 1);
+        let endY = Math.max(this.baseLayer.y + this.baseLayer.h - 1, this.objectLayer.y + this.objectLayer.h - 1);
 
-        for (let y = minYTile; y <= maxYTile; y++) {
-            for (let x = minXTile; x <= maxXTile; x++) {
-                this.renderTile(context, { x, y });
+        for (let y = startY; y <= endY; y++) {
+            for (let x = startX; x <= endX; x++) {
+                const p = { x, y };
+                if (!this.isValidTile(p)) {
+                    this.objectLayer.setTile(p, ObjectTile.Empty);
+                }
             }
         }
     }
 
-    renderTile(
-        context: CanvasRenderingContext2D,
-        pos: Point,
-    ) {
-        const tile = this.getTile(pos);
-        const renderPos = {x: pos.x * TILE_SIZE, y: pos.y * TILE_SIZE }
+    /**
+     * Glows and Plants can't exist without dirt under them.
+     * Plant tops can't exist without a plant under them.
+     * Plant bases also can't exist without a plant top above them.
+     */
+    isValidTile(p: Point): boolean {
+        const objectTile = this.objectLayer.getTile(p);
 
-        if (tile == Tile.Wall) {
-            // Loop through each corner
-            for (const dx of [-1, 1]) {
-                const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
-                for (const dy of [-1, 1]) {
-                    const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
-                    const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
-                    const dxdyTile = this.getTile({ x: pos.x + dx, y: pos.y + dy });
-                    let tilePos: Point;
+        const needDirt = new Set([
+            ObjectTile.Glow,
+            ObjectTile.PlantBase,
+            ObjectTile.DeadPlant,
+        ]);
 
-                    if (dyTile == Tile.Wall) {
-                        if (dxTile == Tile.Wall) {
-                            if (dxdyTile != Tile.Wall) {
-                                // Ending part of the platform.
-                                tilePos = { x: 0, y: 2 };
-                            } else {
-                                tilePos = { x: 0, y: 4 };
-                            }
-                        } else {
-                            tilePos = { x: 0, y: 3 };
-                        }
-                    } else {
-                        if (dxTile == Tile.Wall) {
-                            tilePos = { x: 0, y: 1 };
-                        } else {
-                            // Edge corner piece
-                            if (dxdyTile == Tile.Cave) {
-                                tilePos = { x: 0, y: 5 };
-                            } else {
-                                tilePos = { x: 0, y: 0 };
-                            }
-                        }
-                    }
-                    this.drawQuarterTile(
-                        context,
-                        {
-                            tilePos,
-                            subTilePos,
-                            renderPos
-                        }
-                    );
-                }
-            }
-        } else if (tile == Tile.Cave) {
-            // A similar set of conditions as for the walls.
-            for (const dx of [-1, 1]) {
-                const dxTile = this.getTile({ x: pos.x + dx, y: pos.y });
-                for (const dy of [-1, 1]) {
-                    const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
-                    const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
-                    // Don't need dxdyTile here.
-                    let tilePos: Point;
-
-                    if (dyTile == Tile.Cave || dyTile == Tile.Wall) {
-                        if (dxTile == Tile.Cave || dxTile == Tile.Wall) {
-                            tilePos = { x: 3, y: 3 };
-                        } else {
-                            tilePos = { x: 3, y: 2 };
-                        }
-                    } else {
-                        if (dxTile == Tile.Cave || dxTile == Tile.Wall) {
-                            tilePos = { x: 3, y: 1 };
-                        } else {
-                            tilePos = { x: 3, y: 0 };
-                        }
-                    }
-                    this.drawQuarterTile(
-                        context,
-                        {
-                            tilePos,
-                            subTilePos,
-                            renderPos
-                        }
-                    );
-                }
-            }
-        } else if (tile == Tile.Plant) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 1, y: 2 },
-                    renderPos
-                }
-            );
-        } else if (tile == Tile.PlantTop) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 1, y: 1 },
-                    renderPos
-                }
-            );
-        } else if (tile == Tile.DeadPlant) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 2, y: 2 },
-                    renderPos
-                }
-            );
-        } else if (tile == Tile.Glow) {
-            Aseprite.drawAnimation({
-                context,
-                image: 'glow',
-                animationName: 'idle',
-                time: this.animCount,
-                position: {
-                    x: renderPos.x + TILE_SIZE / 2,
-                    y: renderPos.y + TILE_SIZE,
-                },
-                scale: PHYSICS_SCALE,
-                anchorRatios: { x: 0.5, y: 1 },
-            })
+        if (needDirt.has(objectTile) && !this.hasDirtUnderneath(p)) {
+            return false;
         }
-        // TODO maybe: little grass spikes? idk
+
+        if (objectTile == ObjectTile.PlantBase) {
+            const objectTile = this.objectLayer.getTile({ x: p.x, y: p.y - 1 });
+            if (objectTile != ObjectTile.PlantTop) {
+                return false;
+            }
+        }
+        if (objectTile == ObjectTile.PlantTop) {
+            const objectTile = this.objectLayer.getTile({ x: p.x, y: p.y + 1 });
+            if (objectTile != ObjectTile.PlantBase) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    hasDirtUnderneath(p: Point): boolean {
+        const baseTile = this.baseLayer.getTile({ x: p.x, y: p.y + 1 });
+        return baseTile == BaseTile.Dirt;
     }
 
     advanceDay() {
-        for (let y = 0; y < this.h; y++) {
-            for (let x = 0; x < this.w; x++) {
-                this.tiles[y][x] = this.getNextDayTile(this.tiles[y][x]);
-            }
-        }
-    }
-
-    getNextDayTile(tile: Tile): Tile {
-        switch (tile) {
-            case Tile.Plant:
-                return Tile.DeadPlant;
-            case Tile.PlantTop:
-                return Tile.Empty;
-            case Tile.DeadPlant:
-                return Tile.Empty;
-            default:
-                return tile;
-        }
-    }
-
-    drawTile(
-        context: CanvasRenderingContext2D,
-        {
-            tilePos,
-            renderPos,
-        }: { tilePos: Point; renderPos: Point }
-    ) {
-        // Image must be loaded when this is called.
-        context.drawImage(
-            this.image!,
-            tilePos.x * TILE_SIZE_PX,
-            tilePos.y * TILE_SIZE_PX,
-            TILE_SIZE_PX,
-            TILE_SIZE_PX,
-            renderPos.x,
-            renderPos.y,
-            // +1 is a kludge to avoid gaps between tiles.
-            TILE_SIZE + 1,
-            TILE_SIZE + 1,
-        );
-    }
-
-    drawQuarterTile(
-        context: CanvasRenderingContext2D,
-        {
-            tilePos,
-            subTilePos,
-            renderPos,
-        }: { tilePos: Point; subTilePos: Point; renderPos: Point }
-    ) {
-        // Image must be loaded when this is called.
-        const halfTileSizePx = TILE_SIZE_PX / 2;
-        const halfTileSize = TILE_SIZE / 2;
-        context.drawImage(
-            this.image!,
-            tilePos.x * TILE_SIZE_PX + subTilePos.x * halfTileSizePx,
-            tilePos.y * TILE_SIZE_PX + subTilePos.y * halfTileSizePx,
-            halfTileSizePx,
-            halfTileSizePx,
-            renderPos.x + subTilePos.x * halfTileSize,
-            renderPos.y + subTilePos.y * halfTileSize,
-            // +1 is a kludge to avoid gaps between tiles.
-            halfTileSize + 1,
-            halfTileSize + 1
-        );
-    }
-
-    setTile(p: Point, tile: Tile) {
-        // If out of bounds, extend the board!
-        let y = p.y;
-        while (y + this.y < 1) {
-            this.tiles.unshift(this.tiles[0].slice())
-            this.y++;
-            this.h++;
-        }
-        while (y + this.y >= this.h - 1) {
-            this.tiles.push(this.tiles[this.h - 1].slice())
-            this.h++;
-        }
-
-        let x = p.x;
-        while (x + this.x < 1) {
-            for (let y = 0; y < this.h; y++) {
-                this.tiles[y].unshift(this.tiles[y][0]);
-            }
-            this.x++;
-            this.w++;
-        }
-        while (x + this.x >= this.w - 1) {
-            for (let y = 0; y < this.h; y++) {
-                this.tiles[y].push(this.tiles[y][this.w - 1]);
-            }
-            this.w++;
-        }
-
-        this.tiles[p.y + this.y][p.x + this.x] = tile;
-    }
-
-    setTileAtCoord(p: Point, tile: Tile) {
-        this.setTile({
-            x: Math.floor(p.x / TILE_SIZE),
-            y: Math.floor(p.y / TILE_SIZE),
-        }, tile);
-    }
-
-    getTile(p: Point): Tile {
-        let x = Math.min(Math.max(p.x + this.x, 0), this.w - 1);
-        let y = Math.min(Math.max(p.y + this.y, 0), this.h - 1);
-        return this.tiles[y][x];
-    }
-
-    getTileAtCoord(p: Point): Tile {
-        return this.getTile({
-            x: Math.floor(p.x / TILE_SIZE),
-            y: Math.floor(p.y / TILE_SIZE),
-        });
+        this.objectLayer.advanceDay();
     }
 
     getTileCoord(p: Point, positionInTile: Point): Point {
@@ -335,4 +119,26 @@ export class Tiles {
     static async preload() {
         await Images.loadImage({ name: "tiles", path: "sprites/" });
     }
+
+    getTile(p: Point): PhysicTile {
+        const baseTile = this.baseLayer.getTile(p);
+        if (baseTile == BaseTile.Dirt) {
+            return PhysicTile.Wall;
+        }
+
+        const objectTile = this.objectLayer.getTile(p);
+        if (objectTile == ObjectTile.PlantTop) {
+            return PhysicTile.OneWayPlatform;
+        }
+
+        return PhysicTile.Empty;
+    }
+
+    getTileAtCoord(p: Point): PhysicTile {
+        return this.getTile({
+            x: Math.floor(p.x / TILE_SIZE),
+            y: Math.floor(p.y / TILE_SIZE),
+        });
+    }
+
 }
