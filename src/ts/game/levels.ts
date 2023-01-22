@@ -11,13 +11,13 @@ export interface LevelInfo {
 
 
 export const LEVELS: LevelInfo[] = [
-    // {
-    //     name: 'leveltest2',
-    //     seeds: [
-    //         SeedType.Flower,
-    //     ],
-    //     song: 'farmin-chords',
-    // },
+    {
+        name: 'leveltest2',
+        seeds: [
+            SeedType.Flower,
+        ],
+        song: 'farmin-chords',
+    },
     {
         name: 'flower',
         seeds: [

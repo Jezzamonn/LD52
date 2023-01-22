@@ -68,31 +68,27 @@ export class BaseLayer extends TileLayer<BaseTile> {
                     const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
                     const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
                     const dxdyTile = this.getTile({ x: pos.x + dx, y: pos.y + dy });
-                    let tilePos: Point;
+                    let tilePos: Point = { x: 0, y: 0 };
 
-                    if (dyTile == BaseTile.Dirt) {
-                        if (dxTile == BaseTile.Dirt) {
-                            if (dxdyTile != BaseTile.Dirt) {
-                                // Ending part of the platform.
-                                tilePos = { x: 0, y: 2 };
-                            } else {
-                                tilePos = { x: 0, y: 4 };
-                            }
-                        } else {
-                            tilePos = { x: 0, y: 3 };
-                        }
-                    } else {
-                        if (dxTile == BaseTile.Dirt) {
-                            tilePos = { x: 0, y: 1 };
-                        } else {
-                            // Edge corner piece
-                            if (dxTile == BaseTile.Cave || dyTile == BaseTile.Cave || dxdyTile == BaseTile.Cave) {
-                                tilePos = { x: 0, y: 5 };
-                            } else {
-                                tilePos = { x: 0, y: 0 };
-                            }
-                        }
+                    switch (dxTile) {
+                        case BaseTile.Dirt:
+                            tilePos.x += 1;
+                            break;
+                        case BaseTile.Cave:
+                            tilePos.x += 2;
+                            break;
                     }
+                    switch (dyTile) {
+                        case BaseTile.Dirt:
+                            tilePos.y += 1;
+                            break;
+                    }
+
+                    // Special case for the corner piece.
+                    if (dxTile == BaseTile.Dirt && dyTile == BaseTile.Dirt && dxdyTile != BaseTile.Dirt) {
+                        tilePos.y += 2;
+                    }
+
                     this.drawQuarterTile(
                         context,
                         {
