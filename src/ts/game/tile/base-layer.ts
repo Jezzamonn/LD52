@@ -86,7 +86,7 @@ export class BaseLayer extends TileLayer<BaseTile> {
                             tilePos = { x: 0, y: 1 };
                         } else {
                             // Edge corner piece
-                            if (dxdyTile == BaseTile.Cave) {
+                            if (dxTile == BaseTile.Cave || dyTile == BaseTile.Cave || dxdyTile == BaseTile.Cave) {
                                 tilePos = { x: 0, y: 5 };
                             } else {
                                 tilePos = { x: 0, y: 0 };
@@ -110,22 +110,24 @@ export class BaseLayer extends TileLayer<BaseTile> {
                 for (const dy of [-1, 1]) {
                     const subTilePos = { x: dx < 0 ? 0 : 1, y: dy < 0 ? 0 : 1}
                     const dyTile = this.getTile({ x: pos.x, y: pos.y + dy });
-                    // Don't need dxdyTile here.
-                    let tilePos: Point;
 
-                    if (dyTile == BaseTile.Cave || dyTile == BaseTile.Dirt) {
-                        if (dxTile == BaseTile.Cave || dxTile == BaseTile.Dirt) {
-                            tilePos = { x: 3, y: 3 };
-                        } else {
-                            tilePos = { x: 3, y: 2 };
-                        }
-                    } else {
-                        if (dxTile == BaseTile.Cave || dxTile == BaseTile.Dirt) {
-                            tilePos = { x: 3, y: 1 };
-                        } else {
-                            tilePos = { x: 3, y: 0 };
-                        }
+                    let tilePos: Point = { x: 3, y: 0 };
+
+                    switch (dxTile) {
+                        case BaseTile.Cave:
+                        case BaseTile.Dirt:
+                            tilePos.x += 1;
+                            break;
                     }
+                    switch (dyTile) {
+                        case BaseTile.Cave:
+                            tilePos.y += 1;
+                            break;
+                        case BaseTile.Dirt:
+                            tilePos.y += 2;
+                            break;
+                    }
+
                     this.drawQuarterTile(
                         context,
                         {

@@ -68,7 +68,12 @@ export class Game {
         // Play title music
         Sounds.setSong('farmin-chords');
 
-        // this.startLevel(this.levelIndex);
+        // Show the title.
+        // Don't need to do anything because the title is shown by default in the HTML.
+
+        // For debugging: Load the test level.
+        // this.hideTitle();
+        // this.startLevel(0);
     }
 
     onChoice(type: SeedType | string) {
@@ -103,8 +108,13 @@ export class Game {
         level.initFromImage();
         this.curLevel = level;
 
-        this.seedPicker.show(level.remainingSeeds);
-        this.seedPicker.onChoice = (choice) => this.onChoice(choice);
+        if (levelInfo.seeds.length > 1) {
+            this.seedPicker.show(level.remainingSeeds);
+            this.seedPicker.onChoice = (choice) => this.onChoice(choice);
+        }
+        else {
+            this.onChoice(levelInfo.seeds[0]);
+        }
 
         if (levelInfo.song) {
             Sounds.setSong(levelInfo.song);
@@ -188,7 +198,6 @@ export class Game {
         if (this.showingTitle) {
             if (this.keys.anyWasPressedThisFrame(SELECT_KEYS)) {
                 this.hideTitle();
-                this.showingTitle = false;
                 this.startLevel(this.levelIndex);
             }
             return;
@@ -207,6 +216,8 @@ export class Game {
     hideTitle() {
         const titleElem = document.querySelector('.title-container')!;
         titleElem.classList.add('hidden');
+
+        this.showingTitle = false;
     }
 
     update(dt: number) {

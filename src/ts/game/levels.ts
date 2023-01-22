@@ -11,6 +11,13 @@ export interface LevelInfo {
 
 
 export const LEVELS: LevelInfo[] = [
+    // {
+    //     name: 'leveltest2',
+    //     seeds: [
+    //         SeedType.Flower,
+    //     ],
+    //     song: 'farmin-chords',
+    // },
     {
         name: 'flower',
         seeds: [
@@ -25,7 +32,7 @@ export const LEVELS: LevelInfo[] = [
             SeedType.Vine,
             SeedType.Flower,
         ],
-        // text: 'The Teeny Seed wandered the fields until he found a friend.',
+        text: 'The Teeny Seed wandered the fields until he found a friend.',
     },
     {
         name: 'vine-misdirection',
@@ -116,7 +123,7 @@ export class Levels {
             promises.push(
                 Images.loadImage({name: level.name, path: 'level/', extension: 'gif'}),
             );
-            if (level.song) {
+            if (level.song && Sounds.audios[level.song] === undefined) {
                 promises.push(
                     Sounds.loadSound({name: level.song, path: 'music/'}),
                 );
