@@ -144,6 +144,20 @@ export class Seed extends Entity {
             flippedX: this.facingDir == FacingDir.Left,
             loop,
         });
+
+        // this.renderPlantTileMarker(context);
+    }
+
+    // Draw a little debug rectangle indicating which tile we would plant on.
+    renderPlantTileMarker(context: CanvasRenderingContext2D) {
+        const plantX = this.calculatePlantX();
+        if (plantX == null) {
+            return;
+        }
+        const markerSize = physFromPx(3);
+        const y = this.maxY;
+        context.fillStyle = 'red';
+        context.fillRect(plantX - markerSize / 2, y, markerSize, markerSize);
     }
 
     cameraFocus(): Point {
@@ -354,24 +368,39 @@ export class Seed extends Entity {
     plant() {
         this.planting = true;
         this.animCount = 0;
-        const xCoords = [this.midX, this.minX, this.maxX];
+        this.plantX = this.calculatePlantX()!;
+    }
+
+    calculatePlantX(): number | undefined {
+        const facingMult = this.facingDir == FacingDir.Right ? 1 : -1;
+        // old logic
+        // const xCoords = [
+        //     this.midX,
+        //     this.minX,
+        //     this.maxX,
+        // ];
+        const xCoords = [
+            this.midX + this.w * 0.1 * facingMult,
+            this.midX + this.w * 0.5 * facingMult,
+            this.midX - this.w * 0.5 * facingMult,
+        ];
 
         // If this is a flower, make sure we're planting at the glowing spot if possible.
         if (this.type == SeedType.Flower) {
 
             for (const xCoord of xCoords) {
                 if (this.level.tiles.objectLayer.getTileAtCoord({x: xCoord, y: this.maxY}) == ObjectTile.Glow) {
-                    this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
-                    return;
+                    return this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
                 }
             }
         }
         for (const xCoord of xCoords) {
             if (this.level.tiles.baseLayer.getTileAtCoord({x: xCoord, y: this.maxY + 1}) == BaseTile.Dirt) {
-                this.plantX = this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
+                return this.level.tiles.getTileCoordFromCoord({x: xCoord, y: 0}, {x: 0.5, y: 0}).x;
             }
         }
     }
+
 
     static async preload() {
         // await Aseprite.loadImage({name: 'seed', basePath: 'sprites'})
