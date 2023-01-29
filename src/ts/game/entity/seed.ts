@@ -145,7 +145,7 @@ export class Seed extends Entity {
             loop,
         });
 
-        // this.renderPlantTileMarker(context);
+        this.renderPlantTileMarker(context);
     }
 
     // Draw a little debug rectangle indicating which tile we would plant on.
@@ -154,9 +154,9 @@ export class Seed extends Entity {
         if (plantX == null) {
             return;
         }
-        const markerSize = physFromPx(3);
+        const markerSize = TILE_SIZE;
         const y = this.maxY;
-        context.fillStyle = 'red';
+        context.fillStyle = 'rgba(255, 255, 255, 0.1)';
         context.fillRect(plantX - markerSize / 2, y, markerSize, markerSize);
     }
 
