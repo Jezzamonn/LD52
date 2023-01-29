@@ -40,9 +40,12 @@ export class Tiles implements TileSource<PhysicTile> {
         this.objectLayer.render(context);
     }
 
-    explodeAtCoord(p: Point) {
+    /**
+     * Returns true if an explosion happened.
+     */
+    explodeAtCoord(p: Point): boolean {
         this.objectLayer.setTileAtCoord(p, ObjectTile.Empty);
-        this.baseLayer.explodeAtCoord(p);
+        return this.baseLayer.explodeAtCoord(p);
     }
 
     fixInvalidTiles() {

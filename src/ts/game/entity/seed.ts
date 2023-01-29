@@ -5,7 +5,7 @@ import { SFX } from "../sfx";
 import { Aseprite } from "../../lib/aseprite";
 import { NullKeys } from "../../lib/keys";
 import { Sounds } from "../../lib/sounds";
-import { lerp } from "../../lib/util";
+import { lerp, wait } from "../../lib/util";
 import { Entity } from "./entity";
 import { Sprite } from "./sprite";
 import { BaseTile } from "../tile/base-layer";
@@ -150,6 +150,9 @@ export class Seed extends Entity {
 
     // Draw a little debug rectangle indicating which tile we would plant on.
     renderPlantTileMarker(context: CanvasRenderingContext2D) {
+        if (!this.canPlant()) {
+            return;
+        }
         const plantX = this.calculatePlantX();
         if (plantX == null) {
             return;
@@ -351,18 +354,25 @@ export class Seed extends Entity {
     growVine() {
         // Just make it tall enough for now
         const height = 30;
+        let explosions = 0;
         for (let dy = 0; dy <= height; dy++) {
             const p = {
                 x: this.midX,
                 y: this.maxY - dy * TILE_SIZE
             };
             const type = dy == height ? ObjectTile.VineTop : ObjectTile.Vine
-            this.level.tiles.explodeAtCoord(p);
+            if (this.level.tiles.explodeAtCoord(p)) {
+                explosions++;
+            }
             this.level.tiles.objectLayer.setTileAtCoord(p, type);
         }
         this.level.tiles.fixInvalidTiles();
 
         SFX.play('growVine');
+        explosions = Math.min(explosions, 3);
+        for (let i = 0; i < explosions; i++) {
+            wait(0.1 * i).then(() => SFX.play('explodeSmall'));
+        }
     }
 
     plant() {

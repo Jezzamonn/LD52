@@ -46,11 +46,16 @@ export class BaseLayer extends TileLayer<BaseTile> {
         }
     }
 
-    explodeAtCoord(p: Point) {
+    /**
+     * Returns true if an explosion happened.
+     */
+    explodeAtCoord(p: Point): boolean {
         const tile = this.getTileAtCoord(p);
         if (tile == BaseTile.Dirt) {
             this.setTileAtCoord(p, BaseTile.Cave);
+            return true;
         }
+        return false
     }
 
     renderTile(
