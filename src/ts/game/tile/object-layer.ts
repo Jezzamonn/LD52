@@ -9,19 +9,35 @@ export enum ObjectTile {
     PlantTop = 2,
     DeadPlant = 3,
     Glow = 4,
+    Vine = 5,
+    VineTop = 6,
+}
+
+// Position of the tile in the tileset.
+const tilePositions = {
+    [ObjectTile.PlantBase]: { x: 7, y: 2 },
+    [ObjectTile.PlantTop]: { x: 7, y: 1 },
+    [ObjectTile.DeadPlant]: { x: 8, y: 2 },
+    [ObjectTile.Vine]: { x: 6, y: 2 },
+    [ObjectTile.VineTop]: { x: 6, y: 1 },
 }
 
 function getNextDayTile(tile: ObjectTile): ObjectTile {
-    switch (tile) {
-        case ObjectTile.PlantBase:
-            return ObjectTile.DeadPlant;
-        case ObjectTile.PlantTop:
-            return ObjectTile.Empty;
-        case ObjectTile.DeadPlant:
-            return ObjectTile.Empty;
-        default:
-            return tile;
+    const oneDayTiles = new Set([
+        ObjectTile.PlantTop,
+        ObjectTile.DeadPlant,
+        ObjectTile.Vine,
+        ObjectTile.VineTop,
+    ]);
+    if (oneDayTiles.has(tile)) {
+        return ObjectTile.Empty;
     }
+
+    if (tile == ObjectTile.PlantBase) {
+        return ObjectTile.DeadPlant;
+    }
+
+    return tile;
 }
 
 export class ObjectLayer extends TileLayer<ObjectTile> {
@@ -38,31 +54,8 @@ export class ObjectLayer extends TileLayer<ObjectTile> {
         const tile = this.getTile(pos);
         const renderPos = {x: pos.x * TILE_SIZE, y: pos.y * TILE_SIZE }
 
-        if (tile == ObjectTile.PlantBase) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 1, y: 2 },
-                    renderPos
-                }
-            );
-        } else if (tile == ObjectTile.PlantTop) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 1, y: 1 },
-                    renderPos
-                }
-            );
-        } else if (tile == ObjectTile.DeadPlant) {
-            this.drawTile(
-                context,
-                {
-                    tilePos: { x: 2, y: 2 },
-                    renderPos
-                }
-            );
-        } else if (tile == ObjectTile.Glow) {
+        // Special case: Glow
+        if (tile == ObjectTile.Glow) {
             Aseprite.drawAnimation({
                 context,
                 image: 'glow',
@@ -75,6 +68,14 @@ export class ObjectLayer extends TileLayer<ObjectTile> {
                 scale: PHYSICS_SCALE,
                 anchorRatios: { x: 0.5, y: 1 },
             })
+            return;
         }
+
+        const tilePos = tilePositions[tile];
+        if (!tilePos) {
+            return;
+        }
+
+        this.drawTile(context, {tilePos, renderPos});
     }
 }

@@ -15,6 +15,9 @@ export const LEVELS: LevelInfo[] = [
         name: 'leveltest2',
         seeds: [
             SeedType.Flower,
+            SeedType.Vine,
+            SeedType.Vine,
+            SeedType.Vine,
         ],
         song: 'farmin-chords',
     },
@@ -29,7 +32,7 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'use-vine',
         seeds: [
-            SeedType.Vine,
+            SeedType.Sprout,
             SeedType.Flower,
         ],
         text: 'The Teeny Seed wandered the fields until he found a friend.',
@@ -37,7 +40,7 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'vine-misdirection',
         seeds: [
-            SeedType.Vine,
+            SeedType.Sprout,
             SeedType.Flower,
         ],
         song: 'farmin-default',
@@ -46,7 +49,7 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'explode',
         seeds: [
-            SeedType.Vine,
+            SeedType.Sprout,
             SeedType.Bomb,
             SeedType.Flower,
         ],
@@ -55,7 +58,7 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'explode-and-grow',
         seeds: [
-            SeedType.Vine,
+            SeedType.Sprout,
             SeedType.Bomb,
             SeedType.Flower,
         ],
@@ -64,8 +67,8 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'dirt',
         seeds: [
-            SeedType.Vine,
-            SeedType.Vine,
+            SeedType.Sprout,
+            SeedType.Sprout,
             SeedType.Bomb,
             SeedType.Dirt,
             SeedType.Flower,
@@ -75,7 +78,7 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'tunnel',
         seeds: [
-            SeedType.Vine,
+            SeedType.Sprout,
             SeedType.Bomb,
             SeedType.Dirt,
             SeedType.Flower,
@@ -96,9 +99,9 @@ export const LEVELS: LevelInfo[] = [
     {
         name: 'win',
         seeds: [
-            SeedType.Vine,
-            SeedType.Vine,
-            SeedType.Vine,
+            SeedType.Sprout,
+            SeedType.Sprout,
+            SeedType.Sprout,
             SeedType.Bomb,
             SeedType.Bomb,
             SeedType.Bomb,

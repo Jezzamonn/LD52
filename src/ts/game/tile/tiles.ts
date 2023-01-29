@@ -127,8 +127,12 @@ export class Tiles implements TileSource<PhysicTile> {
         }
 
         const objectTile = this.objectLayer.getTile(p);
-        if (objectTile == ObjectTile.PlantTop) {
-            return PhysicTile.OneWayPlatform;
+        switch (objectTile) {
+            case ObjectTile.PlantTop:
+                return PhysicTile.OneWayPlatform;
+            case ObjectTile.Vine:
+            case ObjectTile.VineTop:
+                return PhysicTile.Wall;
         }
 
         return PhysicTile.Empty;

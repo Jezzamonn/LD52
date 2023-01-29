@@ -13,18 +13,45 @@ import { PhysicTile } from "../tile/tiles";
 import { ObjectTile } from "../tile/object-layer";
 
 export enum SeedType {
-    Vine,
+    Sprout,
     Dirt,
     Bomb,
     Flower,
-}
+    Vine,
+};
 
-const seedTypes = [SeedType.Vine, SeedType.Dirt, SeedType.Bomb, SeedType.Flower];
+export const SeedInfo = {
+    [SeedType.Sprout]: {
+        name: 'Sprout Seed',
+        description: 'Grows a sprout you can stand on.',
+        image: 'seed',
+    },
+    [SeedType.Dirt]: {
+        name: 'Dirt Seed',
+        description: 'Grows some dirt.',
+        image: 'seed-dirt',
+    },
+    [SeedType.Bomb]: {
+        name: 'Cherry Bomb Seed',
+        description: 'Explodes a hole in the ground when it grows.',
+        image: 'seed-bomb',
+    },
+    [SeedType.Flower]: {
+        name: 'Flower Seed',
+        description: 'Grows a flower that you can stand on.',
+        image: 'seed-flower',
+    },
+    [SeedType.Vine]: {
+        name: 'Vine Seed',
+        description: 'Grows a vine that you can climb.',
+        image: 'seed-vine',
+    },
+}
 
 export class Seeds {
     static nextSeed(s: SeedType): SeedType {
         if (s == SeedType.Flower) {
-            return SeedType.Vine;
+            return SeedType.Sprout;
         }
         return s + 1;
     }
@@ -43,34 +70,8 @@ export class Seeds {
     //     }
     // }
 
-    static getImageName(s: SeedType) {
-        switch (s) {
-            case SeedType.Vine:
-                return 'seed';
-            case SeedType.Dirt:
-                return 'seed-dirt';
-            case SeedType.Bomb:
-                return 'seed-bomb';
-            case SeedType.Flower:
-                return 'seed-flower';
-        }
-    }
-
     static randomSeed(): SeedType {
-        return Math.floor(Math.random() * 4);
-    }
-
-    static getDescription(s: SeedType) {
-        switch (s) {
-            case SeedType.Vine:
-                return 'Vine Seed. Grows a vine you can stand on.';
-            case SeedType.Dirt:
-                return 'Dirt Seed. Grows some dirt.';
-            case SeedType.Bomb:
-                return 'Cherry Bomb Seed. Explodes a hole in the ground when it grows.';
-            case SeedType.Flower:
-                return 'Teeny Seed. Grows a precious flower, winning the level. Very fragile, must be planted in glowing soil.';
-        }
+        return Math.floor(Math.random() * 5);
     }
 }
 
@@ -85,7 +86,7 @@ export class Seed extends Entity {
 
     controlledByPlayer = true;
 
-    type = SeedType.Vine;
+    type = SeedType.Sprout;
 
     constructor(level: Level) {
         super(level);
@@ -129,7 +130,7 @@ export class Seed extends Entity {
         const {animName, loop} = this.getAnimationName();
 
         // let filter = Seeds.getFilter(this.type);
-        let imageName = Seeds.getImageName(this.type);
+        let imageName = SeedInfo[this.type].image;
 
         Aseprite.drawAnimation({
             context,
@@ -255,8 +256,8 @@ export class Seed extends Entity {
         this.done = true;
 
         switch (this.type) {
-            case SeedType.Vine:
-                this.growVine();
+            case SeedType.Sprout:
+                this.growSprout();
                 break;
             case SeedType.Dirt:
                 this.growDirt();
@@ -267,10 +268,13 @@ export class Seed extends Entity {
             case SeedType.Flower:
                 this.tryGrowFlower();
                 break;
+            case SeedType.Vine:
+                this.growVine();
+                break;
         }
     }
 
-    growVine() {
+    growSprout() {
         // Check if we have enough space.
         const pos = {x: this.midX, y: this.maxY};
         const above = {x: this.midX, y: this.maxY - TILE_SIZE};
@@ -330,6 +334,23 @@ export class Seed extends Entity {
         SFX.play('explode');
     }
 
+    growVine() {
+        // Just make it tall enough for now
+        const height = 30;
+        for (let dy = 0; dy <= height; dy++) {
+            const p = {
+                x: this.midX,
+                y: this.maxY - dy * TILE_SIZE
+            };
+            const type = dy == height ? ObjectTile.VineTop : ObjectTile.Vine
+            this.level.tiles.explodeAtCoord(p);
+            this.level.tiles.objectLayer.setTileAtCoord(p, type);
+        }
+        this.level.tiles.fixInvalidTiles();
+
+        SFX.play('growVine');
+    }
+
     plant() {
         this.planting = true;
         this.animCount = 0;
@@ -355,8 +376,8 @@ export class Seed extends Entity {
     static async preload() {
         // await Aseprite.loadImage({name: 'seed', basePath: 'sprites'})
         const promises: Promise<Object>[] = [];
-        for (const seedType of seedTypes) {
-            const imageName = Seeds.getImageName(seedType);
+        for (const seedInfo of Object.values(SeedInfo)) {
+            const imageName = seedInfo.image;
             promises.push(Aseprite.loadImage({name: imageName, basePath: 'sprites'}));
         }
         await Promise.all(promises);

@@ -1,4 +1,4 @@
-import { Seeds, SeedType } from "./entity/seed";
+import { SeedInfo, Seeds, SeedType } from "./entity/seed";
 import { Aseprite, images } from "../lib/aseprite";
 import { Sounds } from "../lib/sounds";
 import { Game } from "./game";
@@ -168,7 +168,8 @@ export class SeedPicker {
         if (typeof type === 'string') {
             return type[0].toUpperCase() + type.slice(1);
         }
-        return Seeds.getDescription(type);
+        const seedInfo = SeedInfo[type];
+        return `${seedInfo.name}. ${seedInfo.description}`
     }
 
     async createImageElement(type: SeedType | string): Promise<HTMLElement> {
@@ -193,7 +194,7 @@ export class SeedPicker {
 
     async createSeedImage(seedType: SeedType): Promise<HTMLElement> {
         // const filter = Seeds.getFilter(seedType);
-        const imageName = Seeds.getImageName(seedType);
+        const imageName = SeedInfo[seedType].image;
         const seedSprite = Aseprite.images[imageName];imageName
 
         await seedSprite.loadPromise!;
