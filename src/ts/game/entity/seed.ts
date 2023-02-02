@@ -25,26 +25,36 @@ export const SeedInfo = {
         name: 'Sprout Seed',
         description: 'Grows a sprout you can stand on.',
         image: 'seed',
+        width: 10,
+        height: 12,
     },
     [SeedType.Dirt]: {
         name: 'Dirt Seed',
         description: 'Grows some dirt.',
         image: 'seed-dirt',
+        width: 10,
+        height: 12,
     },
     [SeedType.Bomb]: {
         name: 'Cherry Bomb Seed',
         description: 'Explodes a hole in the ground when it grows.',
         image: 'seed-bomb',
+        width: 10,
+        height: 12,
     },
     [SeedType.Flower]: {
-        name: 'Flower Seed',
-        description: 'Grows a flower that you can stand on.',
+        name: 'Teeny Seed',
+        description: 'Grows a precious flower, winning the level. Very fragile, must be planted in glowing soil.',
         image: 'seed-flower',
+        width: 4,
+        height: 7,
     },
     [SeedType.Vine]: {
         name: 'Vine Seed',
         description: 'Grows a vine that you can climb.',
         image: 'seed-vine',
+        width: 10,
+        height: 12,
     },
 }
 
@@ -86,12 +96,13 @@ export class Seed extends Entity {
 
     controlledByPlayer = true;
 
-    type = SeedType.Sprout;
+    type: SeedType;
 
-    constructor(level: Level) {
+    constructor(level: Level, type: SeedType) {
         super(level);
-        this.w = physFromPx(10);
-        this.h = physFromPx(12);
+        this.type = type;
+        this.w = physFromPx(SeedInfo[type].width);
+        this.h = physFromPx(SeedInfo[type].height);
 
         this.gravity = 0.13 * PHYSICS_SCALE * FPS * FPS
     }

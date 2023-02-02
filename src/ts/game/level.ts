@@ -113,10 +113,9 @@ export class Level {
     }
 
     spawnPlayer(seedType: SeedType) {
-        const seed = new Seed(this);
+        const seed = new Seed(this, seedType);
         seed.midX = this.start.x;
         seed.maxY = this.start.y;
-        seed.type = seedType;
         this.entities.push(seed);
 
         // Remove this seed as an option.
