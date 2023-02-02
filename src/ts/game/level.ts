@@ -11,6 +11,7 @@ import { Tiles } from "./tile/tiles";
 import { Background } from "./background";
 import { BaseTile } from "./tile/base-layer";
 import { ObjectTile } from "./tile/object-layer";
+import { Flower } from "./entity/flower";
 
 // Contains everything in one level, including the tiles and the entities.
 export class Level {
@@ -77,6 +78,12 @@ export class Level {
                     // glow.midX = basePos.x;
                     // glow.maxY = basePos.y;
                     // this.entities.push(glow);
+
+                    // Add a flower to quickly test its rendering
+                    const flower = new Flower(this);
+                    flower.midX = basePos.x;
+                    flower.maxY = basePos.y;
+                    this.entities.push(flower);
                 }
                 else if (color === 'ff0000') {
                     this.start = basePos;

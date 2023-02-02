@@ -11,6 +11,7 @@ import { Sprite } from "./sprite";
 import { BaseTile } from "../tile/base-layer";
 import { PhysicTile } from "../tile/tiles";
 import { ObjectTile } from "../tile/object-layer";
+import { Flower } from "./flower";
 
 export enum SeedType {
     Sprout,
@@ -326,7 +327,8 @@ export class Seed extends Entity {
 
     tryGrowFlower() {
         if (this.isTouchingTile(this.level.tiles.objectLayer, ObjectTile.Glow)) {
-            const flower = new Sprite(this.level, 'flower');
+            // const flower = new Sprite(this.level, 'flower');
+            const flower = new Flower(this.level);
             flower.midX = this.midX;
             flower.maxY = this.maxY;
             this.level.entities.push(flower);
