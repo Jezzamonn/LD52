@@ -74,16 +74,11 @@ export class Level {
                     this.tiles.objectLayer.setTile({ x, y }, ObjectTile.Glow);
                     this.tiles.baseLayer.setTile({ x, y }, BaseTile.Unknown);
 
-                    // const glow = new Sprite(this, 'glow');
-                    // glow.midX = basePos.x;
-                    // glow.maxY = basePos.y;
-                    // this.entities.push(glow);
-
                     // Add a flower to quickly test its rendering
-                    const flower = new Flower(this);
-                    flower.midX = basePos.x;
-                    flower.maxY = basePos.y;
-                    this.entities.push(flower);
+                    // const flower = new Flower(this);
+                    // flower.midX = basePos.x;
+                    // flower.maxY = basePos.y;
+                    // this.entities.push(flower);
                 }
                 else if (color === 'ff0000') {
                     this.start = basePos;
@@ -113,7 +108,7 @@ export class Level {
 
         // If we grew a flower, we win! Yay.
         for (const entity of this.entities) {
-            if (entity instanceof Sprite && entity.name == 'flower') {
+            if ((entity instanceof Sprite && entity.name == 'flower') || (entity instanceof Flower)) {
                 this.won = true;
             }
         }

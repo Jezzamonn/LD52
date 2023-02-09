@@ -327,8 +327,8 @@ export class Seed extends Entity {
 
     tryGrowFlower() {
         if (this.isTouchingTile(this.level.tiles.objectLayer, ObjectTile.Glow)) {
-            // const flower = new Sprite(this.level, 'flower');
-            const flower = new Flower(this.level);
+            const flower = new Sprite(this.level, 'flower');
+            // const flower = new Flower(this.level);
             flower.midX = this.midX;
             flower.maxY = this.maxY;
             this.level.entities.push(flower);
